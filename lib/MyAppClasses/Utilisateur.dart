@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'Groupe.dart';
 import 'Invitation.dart';
@@ -61,5 +62,15 @@ class Utilisateur{
   }
   static Utilisateur creerUtilisateurVide(){
     return Utilisateur(identifiant: '',nomComplet: '',email: '',numeroDeTelephone: '',positionActuel: LatLng(0,0),groupes: [],invitations: []);
+  }
+  Map<String, dynamic> toMap() {
+    return {
+      'identifiant': _identifiant,
+      'nomComplet': _nomComplet,
+      'email': _email,
+      'numeroDeTelephone': _numeroDeTelephone,
+      'imageUrl': _imageUrl,
+      'positionActuel': GeoPoint(_positionActuel.latitude, _positionActuel.longitude),
+    };
   }
 }

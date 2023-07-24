@@ -7,7 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../Services/auth.dart';
 import 'Loading.dart';
 class Inscription extends StatefulWidget {
-  static const String screenRoute = 'inscription' ;
+  static const String screenRoute = '/inscription' ;
   const Inscription({Key? key}) : super(key: key);
 
   @override

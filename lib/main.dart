@@ -1,9 +1,14 @@
 import 'package:app_test/MyAppPages/Connexion.dart';
 import 'package:app_test/MyAppPages/Inscription.dart';
 import 'package:app_test/MyAppPages/MesGroupes.dart';
+import 'package:app_test/MyAppPages/MesInvitations.dart';
+import 'package:app_test/MyAppPages/MonProfile.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import 'MyAppPages/Acceuil.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,21 +16,26 @@ void main() async{
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]).then((_) {
-    runApp(const MyApp());
+    runApp(MyApp());
   });
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+  final _auth = FirebaseAuth.instance ;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      key: UniqueKey(),
       debugShowCheckedModeBanner: false,
-      initialRoute: Connexion.screenRoute,
+      initialRoute: _auth.currentUser == null ? Connexion.screenRoute : Acceuil.screenRoute,
       routes: {
         Connexion.screenRoute: (context) => Connexion(),
         Inscription.screenRoute: (context) => Inscription(),
+        Acceuil.screenRoute: (context) => Acceuil(),
         MesGroupes.screenRoute: (context) => MesGroupes(),
+        MesInvitations.screenRoute: (context) => MesInvitations(),
+        MonProfile.screenRoute: (context) => MonProfile(),
       },
     );
   }

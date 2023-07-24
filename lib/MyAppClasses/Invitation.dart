@@ -36,4 +36,13 @@ class Invitation {
   set idEnvoyeur(String value) {
     _idEnvoyeur = value;
   }
+  Map<String, dynamic> toMap() {
+    return {
+      'idEnvoyeur': _idEnvoyeur,
+      'idRecepteur': _idRecepteur,
+      'idGroupe': _idGroupe,
+      'acceptation': _acceptation,
+      'dejaTraite': _dejaTraite ,
+    };
+  }
 }

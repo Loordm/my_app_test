@@ -5,7 +5,7 @@ import '../Services/auth.dart';
 import 'Loading.dart';
 import 'MesGroupes.dart';
 class Connexion extends StatefulWidget {
-  static const String screenRoute = 'connexion' ;
+  static const String screenRoute = '/connexion' ;
   Connexion({Key? key}) : super(key: key);
   @override
   State<Connexion> createState() => _ConnexionState();
