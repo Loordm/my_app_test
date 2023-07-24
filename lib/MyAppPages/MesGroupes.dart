@@ -9,6 +9,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:places_service/places_service.dart';
 import '../MyAppClasses/Invitation.dart';
 import '../MyAppClasses/Utilisateur.dart';
+import 'Informations du groupe.dart';
 class MesGroupes extends StatefulWidget {
   static const String screenRoute = '/mesGroupes';
   const MesGroupes({Key? key}) : super(key: key);
@@ -21,15 +22,6 @@ class _MesGroupesState extends State<MesGroupes> {
   final CollectionReference utilisateurCollection = FirebaseFirestore.instance.collection('Utilisateur');
   final FirebaseAuth auth = FirebaseAuth.instance;
   Utilisateur utilisateur = Utilisateur.creerUtilisateurVide();
-
-  void getUserData() async{
-      utilisateurCollection.doc(auth.currentUser!.uid).snapshots().listen((event) {
-      utilisateur.identifiant = event.get('identifiant');
-      utilisateur.nomComplet = event.get('nomComplet');
-      utilisateur.numeroDeTelephone = event.get('numeroDeTelephone') ;
-      utilisateur.email = event.get('email');
-    });
-  }
   @override
   void initState() {
     super.initState();
@@ -66,7 +58,7 @@ class _MesGroupesState extends State<MesGroupes> {
             stream: utilisateurCollection.doc(auth.currentUser!.uid).collection('Groupes').snapshots(),
             builder: (context,snapshot){
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator();
+                return Center(child: CircularProgressIndicator());
               }
               if (!snapshot.hasData) {
                 return Text('No user data found');
@@ -89,6 +81,7 @@ class _MesGroupesState extends State<MesGroupes> {
                     nomComplet: groupe['owner']['nomComplet'],
                     email: groupe['owner']['email'],
                     numeroDeTelephone: groupe['owner']['numeroDeTelephone'],
+                    imageUrl: groupe['owner']['imageUrl'],
                     positionActuel: LatLng(geoPointArrivee.latitude, geoPointArrivee.longitude),
                   );
                   groupesList.add(newGroupe); // Add the new Groupe object to the list
@@ -100,7 +93,11 @@ class _MesGroupesState extends State<MesGroupes> {
                       final groupe = utilisateur.groupes[index];
                       return GestureDetector(
                         onTap: () {
-
+                          if (groupe.owner.identifiant == auth.currentUser!.uid){
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => InfoGroupe(groupe.idGroupe,true)));
+                          }else {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => InfoGroupe(groupe.idGroupe,false)));
+                          }
                         },
                         child: Container(
                           decoration: BoxDecoration(
@@ -167,11 +164,11 @@ class _MesGroupesState extends State<MesGroupes> {
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.red,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(24), // Set the radius here
+                                        borderRadius: BorderRadius.circular(24),
                                       ),
                                     ),
                                     onPressed: ()async{
-                                      await CloudFirestoreMethodes().annulerGroupe(auth.currentUser!.uid, groupe.idGroupe);
+                                      await CloudFirestoreMethodes().supprimerGroupe(auth.currentUser!.uid, groupe.idGroupe);
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         const SnackBar(
                                             duration: Duration(seconds: 2),
@@ -179,8 +176,15 @@ class _MesGroupesState extends State<MesGroupes> {
                                         ),
                                       );
                                     },
-                                    child: Text(
-                                      'Annuler ce groupe',
+                                    child: groupe.owner.identifiant == auth.currentUser!.uid ? Text(
+                                      'Supprimer ce groupe',
+                                      style: TextStyle(
+                                          fontFamily: 'Poppins',
+                                          fontSize: 14,
+                                          color: Colors.white
+                                      ),
+                                    ) : Text(
+                                      'Quitter ce groupe',
                                       style: TextStyle(
                                           fontFamily: 'Poppins',
                                           fontSize: 14,
@@ -202,8 +206,7 @@ class _MesGroupesState extends State<MesGroupes> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: (){
-
+        onPressed: ()async{
         },
         child: Icon(Icons.add),
         backgroundColor: Colors.indigoAccent[400],

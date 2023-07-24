@@ -5,12 +5,6 @@ import '../MyAppClasses/Utilisateur.dart';
 
 class CloudFirestoreMethodes {
   final CollectionReference _utilisateurCollection = FirebaseFirestore.instance.collection('Utilisateur');
-  final CollectionReference _testCollection = FirebaseFirestore.instance.collection('test');
-  Future<void> creerTest(String text)async{
-    await _testCollection.add({
-      'text': text
-    });
-  }
   Future<void> creerUtilisateur(Utilisateur utilisateur) async {
     await _utilisateurCollection.doc(utilisateur.identifiant).set({
       'identifiant': utilisateur.identifiant,
@@ -54,8 +48,31 @@ class CloudFirestoreMethodes {
         .doc(docRef.id)
         .set(groupeData);
   }
-  Future<void>annulerGroupe(String uid, String idGroupe) async{
+  Future<void> ajouterUtilisateurAuGroupe(String uidUtilisateur, String uidGroupe, Utilisateur utilisateur) async{
+    DocumentReference groupeDocRef = _utilisateurCollection.doc(uidUtilisateur).collection("Groupes").doc(uidGroupe);
+    Map<String, dynamic> userMap = utilisateur.toMap();
+    await groupeDocRef.update({
+      'membres': FieldValue.arrayUnion([userMap]),
+    });
+  }
+  Future<void>supprimerGroupe(String uid, String idGroupe) async{
     DocumentReference groupeRef = _utilisateurCollection.doc(uid).collection('Groupes').doc(idGroupe);
     groupeRef.delete();
+  }
+  Future<void> supprimerUtilisateurAuGroupe(String uidUser, String uidGroupe, int index) async {
+    DocumentReference groupeDocRef = _utilisateurCollection.doc(uidUser).collection('Groupes').doc(uidGroupe);
+    await groupeDocRef.get().then((snapshot) {
+      if (snapshot.exists) {
+        List<Map<String, dynamic>> listMembres = List<Map<String, dynamic>>.from((snapshot.data() as Map<String, dynamic>)['membres']);
+        if (index >= 0 && index < listMembres.length) {
+          listMembres.removeAt(index);
+          groupeDocRef.update({'membres': listMembres});
+        } else {
+          throw Exception("Index non valide");
+        }
+      } else {
+        throw Exception("Utilisateur non existant");
+      }
+    });
   }
 }

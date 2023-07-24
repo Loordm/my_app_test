@@ -17,6 +17,7 @@ class Utilisateur{
     required String nomComplet,
     required String email,
     required String numeroDeTelephone,
+    required String imageUrl,
     required LatLng positionActuel,
     List<Groupe> groupes = const [],
     List<Invitation> invitations = const [],
@@ -24,6 +25,7 @@ class Utilisateur{
         _nomComplet = nomComplet,
         _email = email,
         _numeroDeTelephone = numeroDeTelephone,
+        _imageUrl = imageUrl,
         _positionActuel = positionActuel,
         _groupes = groupes,
         _invitations = invitations;
@@ -61,7 +63,7 @@ class Utilisateur{
     _invitations.add(invitation);
   }
   static Utilisateur creerUtilisateurVide(){
-    return Utilisateur(identifiant: '',nomComplet: '',email: '',numeroDeTelephone: '',positionActuel: LatLng(0,0),groupes: [],invitations: []);
+    return Utilisateur(identifiant: '',nomComplet: '',email: '',numeroDeTelephone: '',imageUrl: 'https://imgv3.fotor.com/images/blog-richtext-image/10-profile-picture-ideas-to-make-you-stand-out.jpg',positionActuel: LatLng(0,0),groupes: [],invitations: []);
   }
   Map<String, dynamic> toMap() {
     return {

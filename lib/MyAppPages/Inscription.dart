@@ -181,7 +181,7 @@ class _InscriptionState extends State<Inscription> {
                           print('email : ${_emailController.text}');
                           print('mot de passe : ${_motDePasseController.text}');
                           print('******************************************');
-                          Utilisateur utilisateur = Utilisateur(identifiant: '', nomComplet: _nomCompletController.text, email: _emailController.text, numeroDeTelephone: _numeroDeTelephoneController.text, positionActuel: const LatLng(0,0));
+                          Utilisateur utilisateur = Utilisateur(identifiant: '', nomComplet: _nomCompletController.text, email: _emailController.text, numeroDeTelephone: _numeroDeTelephoneController.text,imageUrl: 'https://imgv3.fotor.com/images/blog-richtext-image/10-profile-picture-ideas-to-make-you-stand-out.jpg', positionActuel: const LatLng(0,0));
                           dynamic result = await _auth.signUp(
                               _emailController.text,
                               _motDePasseController.text,
