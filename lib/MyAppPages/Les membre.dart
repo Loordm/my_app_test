@@ -189,7 +189,7 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
               return Center(child: CircularProgressIndicator());
             }
             if (!snapshot.hasData) {
-              return Text('No user data found');
+              return Text('Il n\'existe aucun membre');
             } else {
               // get les informations du goupe
               DateTime dateDepart = snapshot.data!['dateDepart'].toDate();

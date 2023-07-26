@@ -1,3 +1,4 @@
+import 'package:app_test/MyAppPages/Acceuil.dart';
 import 'package:app_test/MyAppPages/Inscription.dart';
 import 'package:flutter/material.dart';
 
@@ -133,7 +134,7 @@ class _ConnexionState extends State<Connexion> {
                               ),
                             );
                           }else {
-                            Navigator.pushNamedAndRemoveUntil(context, MesGroupes.screenRoute, (route) => false);
+                            Navigator.pushNamedAndRemoveUntil(context, Acceuil.screenRoute, (route) => false);
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                   duration: Duration(seconds: 2),

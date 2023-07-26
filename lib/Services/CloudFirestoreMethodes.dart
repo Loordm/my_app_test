@@ -1,6 +1,7 @@
 import 'package:app_test/MyAppClasses/Groupe.dart';
 import 'package:app_test/MyAppClasses/Invitation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../MyAppClasses/Utilisateur.dart';
 
 class CloudFirestoreMethodes {
@@ -30,7 +31,33 @@ class CloudFirestoreMethodes {
       'invitations': FieldValue.arrayUnion([invitMap]),
     });
   }
-  
+  Future<void>modifierInvitation(String uid, int index, bool accepter) async {
+    List<Invitation> listeInvitation = [];
+    await _utilisateurCollection
+        .doc(uid)
+        .get()
+        .then((snapshot) async {
+      if (snapshot.exists) {
+        List<dynamic> invitationsData = snapshot.get('invitations');
+          for (var invitationData in invitationsData) {
+            Invitation invitation = Invitation(
+              idEnvoyeur: invitationData['idEnvoyeur'],
+              idRecepteur: invitationData['idRecepteur'],
+              idGroupe: invitationData['idGroupe'],
+              acceptation: invitationData['acceptation'],
+              dejaTraite: invitationData['dejaTraite'],
+            );
+            invitation.dejaTraite = true;
+            invitation.acceptation = accepter;
+            listeInvitation.add(invitation);
+          }
+      }
+  });
+    DocumentReference utilisateurDocRef = _utilisateurCollection.doc(uid);
+    List<Map<String, dynamic>> invitationsMapList = listeInvitation.map((notification) => notification.toMap()).toList();
+    await utilisateurDocRef.update({'invitations': invitationsMapList});
+  }
+
   Future<void> ajouterGroupe(String uid, Groupe groupe) async {
     Map<String, dynamic> groupeData = groupe.toMap();
     DocumentReference docRef = await FirebaseFirestore.instance
@@ -49,7 +76,7 @@ class CloudFirestoreMethodes {
         .set(groupeData);
   }
   Future<void> ajouterUtilisateurAuGroupe(String uidUtilisateur, String uidGroupe, Utilisateur utilisateur) async{
-    DocumentReference groupeDocRef = _utilisateurCollection.doc(uidUtilisateur).collection("Groupes").doc(uidGroupe);
+    DocumentReference groupeDocRef = _utilisateurCollection.doc(uidUtilisateur).collection('Groupes').doc(uidGroupe);
     Map<String, dynamic> userMap = utilisateur.toMap();
     await groupeDocRef.update({
       'membres': FieldValue.arrayUnion([userMap]),
@@ -74,5 +101,22 @@ class CloudFirestoreMethodes {
         throw Exception("Utilisateur non existant");
       }
     });
+  }
+  Future<void> modifierPositionActuel(String uid, LatLng positionActuel) async {
+    DocumentReference utilisateurDocRef = _utilisateurCollection.doc(uid);
+    final position = GeoPoint(positionActuel.latitude, positionActuel.longitude);
+    await utilisateurDocRef.update({'positionActuel': position});
+  }
+  Future<void> modifierNomComplet(String uid, String nomComplet) async {
+    DocumentReference utilisateurDocRef = _utilisateurCollection.doc(uid);
+    await utilisateurDocRef.update({'nomComplet': nomComplet});
+  }
+  Future<void> modifierNumeroDeTelephone(String uid, String numeroDeTephone) async {
+    DocumentReference utilisateurDocRef = _utilisateurCollection.doc(uid);
+    await utilisateurDocRef.update({'numeroDeTelephone': numeroDeTephone});
+  }
+  Future<void> modifierImage(String uid, String imageUrl) async {
+    DocumentReference utilisateurDocRef = _utilisateurCollection.doc(uid);
+    await utilisateurDocRef.update({'imageUrl': imageUrl});
   }
 }

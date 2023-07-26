@@ -1,8 +1,12 @@
+import 'package:app_test/MyAppPages/Consulter%20le%20deplacement%20sur%20la%20carte.dart';
 import 'package:app_test/MyAppPages/Les%20membre.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:places_service/places_service.dart';
+
+import '../MyAppClasses/Utilisateur.dart';
 
 class InfoGroupe extends StatefulWidget {
   String idGroupe;
@@ -19,6 +23,8 @@ class _InfoGroupeState extends State<InfoGroupe> {
   final CollectionReference utilisateurCollection =
       FirebaseFirestore.instance.collection('Utilisateur');
   final FirebaseAuth auth = FirebaseAuth.instance;
+  List<String> listIdUsers = [];
+
 
   @override
   Widget build(BuildContext context) {
@@ -144,7 +150,7 @@ class _InfoGroupeState extends State<InfoGroupe> {
                     return Center(child: CircularProgressIndicator());
                   }
                   if (!snapshot.hasData) {
-                    return Text('No user data found');
+                    return Text('Il n\'existe aucun groupe');
                   } else {
                     DateTime dateDepart = snapshot.data!['dateDepart'].toDate();
                     PlacesAutoCompleteResult lieuArrivee = PlacesAutoCompleteResult(
@@ -153,6 +159,23 @@ class _InfoGroupeState extends State<InfoGroupe> {
                       mainText: snapshot.data!['lieuArrivee']['mainText'],
                       secondaryText: snapshot.data!['lieuArrivee']['secondaryText'],
                     );
+                    // get les membres du groupe
+                    List<Map<String, dynamic>> membersData = (snapshot.data!['membres'] as List<dynamic>).cast<Map<String, dynamic>>();
+                    if (membersData.isNotEmpty) {
+                      List<Utilisateur> membres = membersData.map((memberData) {
+                        return Utilisateur(
+                            identifiant: memberData['identifiant'],
+                            email: memberData['email'],
+                            numeroDeTelephone: memberData['numeroDeTelephone'],
+                            imageUrl: memberData['imageUrl'],
+                            nomComplet: memberData['nomComplet'],
+                            positionActuel: LatLng(0, 0));
+                      }).toList();
+                      listIdUsers.clear();
+                      for (Utilisateur u in membres) {
+                        listIdUsers.add(u.identifiant);
+                      }
+                    }
                     return Column(
                       children: [
                         Row(
@@ -237,7 +260,9 @@ class _InfoGroupeState extends State<InfoGroupe> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            onPressed: (){},
+                            onPressed: (){
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => DeplacementSurLaCarte(widget.idGroupe,listIdUsers),));
+                            },
                             child: Text(
                               'Consulter le déplacement sur la carte',
                               style: TextStyle(
