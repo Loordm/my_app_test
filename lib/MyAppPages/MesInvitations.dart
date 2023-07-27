@@ -114,168 +114,298 @@ class _MesInvitationsState extends State<MesInvitations> {
                             builder: (context, snapshot) {
                               if (!snapshot.hasData) {
                                 return Center();
-                              } else {
-                                Groupe groupe = Groupe.creerGroupeVide();
-                                DateTime dateDepart = snapshot.data!['dateDepart'].toDate();
-                                PlacesAutoCompleteResult lieuArrivee = PlacesAutoCompleteResult(
-                                    placeId: snapshot.data!['lieuArrivee']['placeId'],
-                                    description: snapshot.data!['lieuArrivee']['description'],
-                                    mainText: snapshot.data!['lieuArrivee']['mainText'],
-                                    secondaryText: snapshot.data!['lieuArrivee']
-                                    ['secondaryText']);
-                                groupe.lieuArrivee = lieuArrivee ;
-                                groupe.dateDepart = dateDepart;
-                                // get owner
-                                groupe.owner.identifiant = snapshot.data!['owner']['identifiant'];
-                                groupe.owner.email = snapshot.data!['owner']['email'];
-                                groupe.owner.numeroDeTelephone =
-                                snapshot.data!['owner']['numeroDeTelephone'];
-                                groupe.owner.nomComplet = snapshot.data!['owner']['nomComplet'];
-                                groupe.owner.imageUrl = snapshot.data!['owner']['imageUrl'];
-                                List<Map<String, dynamic>> membersData = (snapshot.data!['membres'] as List<dynamic>).cast<Map<String, dynamic>>();
-                                if (membersData.isNotEmpty) {
-                                  List<Utilisateur> membres = membersData.map((memberData) {
-                                    return Utilisateur(
-                                        identifiant: memberData['identifiant'],
-                                        email: memberData['email'],
-                                        numeroDeTelephone: memberData['numeroDeTelephone'],
-                                        imageUrl: memberData['imageUrl'],
-                                        nomComplet: memberData['nomComplet'],
-                                        positionActuel: LatLng(0, 0));
-                                  }).toList();
-                                  groupe.membres = membres;
-                                }
-                                return Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  width: screenWidth,
-                                  height: (!invitations[index].dejaTraite) ? screenHeight/2.6 : screenHeight/3.2,
-                                  padding: EdgeInsets.fromLTRB(4, 8, 4, 0),
-                                  margin: EdgeInsets.symmetric(horizontal: 24,vertical: 24),
-                                  child: Column(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                                        child: Row(
-                                          children: [
-                                            ClipRRect(
-                                              borderRadius: BorderRadius.circular(100),
-                                              child: Image.network(
-                                                '${utilisateur.imageUrl}',
-                                                fit: BoxFit.cover,
-                                                width: screenWidth / 7,
-                                                height: screenWidth / 7,
+                              }
+                              else if (snapshot.connectionState == ConnectionState.waiting) {
+                                // While data is loading
+                                return CircularProgressIndicator();
+                              }
+                              else if (snapshot.hasError) {
+                                // Handle the error
+                                return Text('Error: ${snapshot.error}');
+                              }
+                              else {
+                                if (snapshot.data!.exists) {
+                                  Groupe groupe = Groupe.creerGroupeVide();
+                                  DateTime dateDepart = snapshot
+                                      .data!['dateDepart'].toDate();
+                                  PlacesAutoCompleteResult lieuArrivee = PlacesAutoCompleteResult(
+                                      placeId: snapshot
+                                          .data!['lieuArrivee']['placeId'],
+                                      description: snapshot
+                                          .data!['lieuArrivee']['description'],
+                                      mainText: snapshot
+                                          .data!['lieuArrivee']['mainText'],
+                                      secondaryText: snapshot
+                                          .data!['lieuArrivee']
+                                      ['secondaryText']);
+                                  groupe.lieuArrivee = lieuArrivee;
+                                  groupe.dateDepart = dateDepart;
+                                  // get owner
+                                  groupe.owner.identifiant =
+                                  snapshot.data!['owner']['identifiant'];
+                                  groupe.owner.email =
+                                  snapshot.data!['owner']['email'];
+                                  groupe.owner.numeroDeTelephone =
+                                  snapshot.data!['owner']['numeroDeTelephone'];
+                                  groupe.owner.nomComplet =
+                                  snapshot.data!['owner']['nomComplet'];
+                                  groupe.owner.imageUrl =
+                                  snapshot.data!['owner']['imageUrl'];
+                                  List<Map<String,
+                                      dynamic>> membersData = (snapshot
+                                      .data!['membres'] as List<dynamic>).cast<
+                                      Map<String, dynamic>>();
+                                  if (membersData.isNotEmpty) {
+                                    List<Utilisateur> membres = membersData
+                                        .map((memberData) {
+                                      return Utilisateur(
+                                          identifiant: memberData['identifiant'],
+                                          email: memberData['email'],
+                                          numeroDeTelephone: memberData['numeroDeTelephone'],
+                                          imageUrl: memberData['imageUrl'],
+                                          nomComplet: memberData['nomComplet'],
+                                          positionActuel: LatLng(0, 0));
+                                    }).toList();
+                                    groupe.membres = membres;
+                                  }
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    width: screenWidth,
+                                    height: (!invitations[index].dejaTraite)
+                                        ? screenHeight / 2.6
+                                        : screenHeight / 3.2,
+                                    padding: EdgeInsets.fromLTRB(4, 8, 4, 0),
+                                    margin: EdgeInsets.symmetric(
+                                        horizontal: 24, vertical: 24),
+                                    child: Column(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.fromLTRB(
+                                              8, 0, 0, 0),
+                                          child: Row(
+                                            children: [
+                                              ClipRRect(
+                                                borderRadius: BorderRadius
+                                                    .circular(100),
+                                                child: Image.network(
+                                                  '${utilisateur.imageUrl}',
+                                                  fit: BoxFit.cover,
+                                                  width: screenWidth / 7,
+                                                  height: screenWidth / 7,
+                                                ),
                                               ),
-                                            ),
-                                            Column(
-                                              children: [
-                                                Text(
-                                                  '  ${utilisateur.nomComplet}',
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontFamily: 'Poppins',
-                                                    fontWeight: FontWeight.w300,
-                                                    color: Colors.black,
+                                              Column(
+                                                children: [
+                                                  Text(
+                                                    '  ${utilisateur
+                                                        .nomComplet}',
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontFamily: 'Poppins',
+                                                      fontWeight: FontWeight
+                                                          .w300,
+                                                      color: Colors.black,
+                                                    ),
                                                   ),
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Text(
-                                                      '  ${utilisateur.numeroDeTelephone}',
-                                                      style: TextStyle(
-                                                        fontSize: 16,
-                                                        fontFamily: 'Poppins',
-                                                        fontWeight: FontWeight.w300,
-                                                        color: Colors.indigoAccent[400],
+                                                  Row(
+                                                    children: [
+                                                      Text(
+                                                        '  ${utilisateur
+                                                            .numeroDeTelephone}',
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontFamily: 'Poppins',
+                                                          fontWeight: FontWeight
+                                                              .w300,
+                                                          color: Colors
+                                                              .indigoAccent[400],
+                                                        ),
                                                       ),
-                                                    ),
-                                                    SizedBox(width: screenWidth/20,),
-                                                    Text(
-                                                      '${utilisateur.email}',
-                                                      style: TextStyle(
-                                                        fontSize: 16,
-                                                        fontFamily: 'Poppins',
-                                                        fontWeight: FontWeight.w300,
-                                                        color: Colors.indigoAccent[400],
+                                                      SizedBox(
+                                                        width: screenWidth /
+                                                            20,),
+                                                      Text(
+                                                        '${utilisateur.email}',
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontFamily: 'Poppins',
+                                                          fontWeight: FontWeight
+                                                              .w300,
+                                                          color: Colors
+                                                              .indigoAccent[400],
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ],
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(height: 6,),
-                                      Padding(
-                                        padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              'Invitation pour rejoindre le groupe de Grine Mohammed pour allez vers :',
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.w300,
-                                                color: Colors.black,
+                                        SizedBox(height: 6,),
+                                        Padding(
+                                          padding: const EdgeInsets.fromLTRB(
+                                              8, 0, 8, 0),
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment
+                                                .center,
+                                            crossAxisAlignment: CrossAxisAlignment
+                                                .center,
+                                            children: [
+                                              Text(
+                                                'Invitation pour rejoindre le groupe de Grine Mohammed pour allez vers :',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontFamily: 'Poppins',
+                                                  fontWeight: FontWeight.w300,
+                                                  color: Colors.black,
+                                                ),
                                               ),
-                                            ),
-                                            Text(
-                                              '${lieuArrivee.description}, le ${dateDepart.day}/${dateDepart.month}/${dateDepart.year}',
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.indigoAccent[400],
+                                              Text(
+                                                '${lieuArrivee
+                                                    .description}, le ${dateDepart
+                                                    .day}/${dateDepart
+                                                    .month}/${dateDepart.year}',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontFamily: 'Poppins',
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors
+                                                      .indigoAccent[400],
+                                                ),
                                               ),
-                                            ),
-                                            SizedBox(height: 12,),
-                                            (!invitations[index].dejaTraite) ? Column(
-                                              children: [
-                                                Container(
-                                                  width: screenWidth,
-                                                  height: 50,
-                                                  child: ElevatedButton(
-                                                    style: ElevatedButton.styleFrom(
-                                                      backgroundColor: Colors.green[200],
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius:
-                                                        BorderRadius.circular(8),
+                                              SizedBox(height: 12,),
+                                              (!invitations[index].dejaTraite)
+                                                  ? Column(
+                                                children: [
+                                                  Container(
+                                                    width: screenWidth,
+                                                    height: 50,
+                                                    child: ElevatedButton(
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        backgroundColor: Colors
+                                                            .green[200],
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius:
+                                                          BorderRadius.circular(
+                                                              8),
+                                                        ),
+                                                      ),
+                                                      onPressed: () async {
+                                                        setState(() {
+                                                          invitations[index]
+                                                              .dejaTraite =
+                                                          true;
+                                                          invitations[index]
+                                                              .acceptation =
+                                                          true;
+                                                        });
+                                                        await _cloudFirestore
+                                                            .modifierInvitation(
+                                                            auth.currentUser!
+                                                                .uid, index,
+                                                            true);
+                                                        await _cloudFirestore
+                                                            .ajouterGroupe(
+                                                            auth.currentUser!
+                                                                .uid, groupe);
+                                                        await _cloudFirestore
+                                                            .ajouterUtilisateurAuGroupe(
+                                                            groupe.owner
+                                                                .identifiant,
+                                                            invitation.idGroupe,
+                                                            currentUser);
+                                                      },
+                                                      child: Container(
+                                                        width: screenWidth,
+                                                        height: 50,
+                                                        child: Row(
+                                                          children: [
+                                                            Container(
+                                                              color: Colors
+                                                                  .green,
+                                                              child: Icon(
+                                                                  Icons.check),
+                                                            ),
+                                                            SizedBox(width: 8),
+                                                            Expanded(
+                                                              child: Align(
+                                                                alignment: Alignment
+                                                                    .center,
+                                                                child: Text(
+                                                                  'Accepter l\'invitation',
+                                                                  style: TextStyle(
+                                                                    fontSize: 16,
+                                                                    fontFamily: 'Poppins',
+                                                                    fontWeight: FontWeight
+                                                                        .bold,
+                                                                    color: Colors
+                                                                        .green[600],
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
                                                     ),
-                                                    onPressed: () async{
-                                                      setState(() {
-                                                        invitations[index].dejaTraite = true ;
-                                                        invitations[index].acceptation= true ;
-                                                      });
-                                                      await _cloudFirestore.modifierInvitation(auth.currentUser!.uid, index, true);
-                                                      await _cloudFirestore.ajouterGroupe(auth.currentUser!.uid, groupe);
-                                                      await _cloudFirestore.ajouterUtilisateurAuGroupe(groupe.owner.identifiant, invitation.idGroupe, currentUser);
-                                                    },
-                                                    child: Container(
-                                                      width: screenWidth,
-                                                      height: 50,
+                                                  ),
+                                                  SizedBox(
+                                                    height: screenHeight / 40,),
+                                                  Container(
+                                                    width: screenWidth,
+                                                    height: 50,
+                                                    child: ElevatedButton(
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        backgroundColor: Colors
+                                                            .red[200],
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius:
+                                                          BorderRadius.circular(
+                                                              8),
+                                                        ),
+                                                      ),
+                                                      onPressed: () async {
+                                                        setState(() {
+                                                          invitations[index]
+                                                              .dejaTraite =
+                                                          true;
+                                                          invitations[index]
+                                                              .acceptation =
+                                                          false;
+                                                        });
+                                                        await _cloudFirestore
+                                                            .modifierInvitation(
+                                                            auth.currentUser!
+                                                                .uid, index,
+                                                            false);
+                                                      },
                                                       child: Row(
                                                         children: [
                                                           Container(
-                                                            color: Colors.green,
-                                                            child: Icon(Icons.check),
+                                                            color: Colors.red,
+                                                            child: Icon(
+                                                                Icons.close),
                                                           ),
                                                           SizedBox(width: 8),
                                                           Expanded(
                                                             child: Align(
-                                                              alignment: Alignment.center,
+                                                              alignment: Alignment
+                                                                  .center,
                                                               child: Text(
-                                                                'Accepter l\'invitation',
+                                                                'Réfuser l\'invitation',
                                                                 style: TextStyle(
                                                                   fontSize: 16,
                                                                   fontFamily: 'Poppins',
-                                                                  fontWeight: FontWeight.bold,
-                                                                  color: Colors.green[600],
+                                                                  fontWeight: FontWeight
+                                                                      .bold,
+                                                                  color: Colors
+                                                                      .red[600],
                                                                 ),
                                                               ),
                                                             ),
@@ -284,97 +414,65 @@ class _MesInvitationsState extends State<MesInvitations> {
                                                       ),
                                                     ),
                                                   ),
-                                                ),
-                                                SizedBox(height: screenHeight/40,),
-                                                Container(
-                                                  width: screenWidth,
-                                                  height: 50,
-                                                  child: ElevatedButton(
-                                                    style: ElevatedButton.styleFrom(
-                                                      backgroundColor: Colors.red[200],
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius:
-                                                        BorderRadius.circular(8),
-                                                      ),
-                                                    ),
-                                                    onPressed: () async{
-                                                      setState(() {
-                                                        invitations[index].dejaTraite = true;
-                                                        invitations[index].acceptation= false ;
-                                                      });
-                                                      await _cloudFirestore.modifierInvitation(auth.currentUser!.uid, index, false);
-                                                    },
-                                                    child: Row(
-                                                      children: [
-                                                        Container(
-                                                          color: Colors.red,
-                                                          child: Icon(Icons.close),
-                                                        ),
-                                                        SizedBox(width: 8),
-                                                        Expanded(
-                                                          child: Align(
-                                                            alignment: Alignment.center,
-                                                            child: Text(
-                                                              'Réfuser l\'invitation',
-                                                              style: TextStyle(
-                                                                fontSize: 16,
-                                                                fontFamily: 'Poppins',
-                                                                fontWeight: FontWeight.bold,
-                                                                color: Colors.red[600],
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ) :
-                                            Container(
-                                              margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
-                                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(20),
-                                                color: (invitations[index].acceptation) ? Colors.green[100] : Colors.red[100],
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  (invitations[index].acceptation) ? Icon(
-                                                    Icons.check_circle,
-                                                    size: 40,
-                                                    color: Colors.green,
-
-                                                  ) :
-                                                  Icon(
-                                                    Icons.cancel,
-                                                    size: 40,
-                                                    color: Colors.red,
-
-                                                  ),
-                                                  (invitations[index].acceptation) ? Text("L\'invitation a été acceptée",
-                                                    style: TextStyle(
-                                                      fontSize: 16,
-                                                      color: Colors.green,
-                                                    ),
-                                                  ) :
-                                                  Text("L\'invitation a été refusée",
-                                                    style: TextStyle(
-                                                      fontSize: 16,
-                                                      color: Colors.red,
-                                                    ),
-                                                  )
-
                                                 ],
-                                              ),
-                                            )
-                                          ],
+                                              )
+                                                  :
+                                              Container(
+                                                margin: EdgeInsets.fromLTRB(
+                                                    5, 0, 5, 0),
+                                                padding: EdgeInsets.fromLTRB(
+                                                    0, 10, 0, 10),
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius
+                                                      .circular(20),
+                                                  color: (invitations[index]
+                                                      .acceptation) ? Colors
+                                                      .green[100] : Colors
+                                                      .red[100],
+                                                ),
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment
+                                                      .center,
+                                                  children: [
+                                                    (invitations[index]
+                                                        .acceptation) ? Icon(
+                                                      Icons.check_circle,
+                                                      size: 40,
+                                                      color: Colors.green,
+
+                                                    ) :
+                                                    Icon(
+                                                      Icons.cancel,
+                                                      size: 40,
+                                                      color: Colors.red,
+
+                                                    ),
+                                                    (invitations[index]
+                                                        .acceptation) ? Text(
+                                                      "L\'invitation a été acceptée",
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        color: Colors.green,
+                                                      ),
+                                                    ) :
+                                                    Text(
+                                                      "L\'invitation a été refusée",
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        color: Colors.red,
+                                                      ),
+                                                    )
+
+                                                  ],
+                                                ),
+                                              )
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                );
+                                      ],
+                                    ),
+                                  );
+                                }else return SizedBox(width: 0,height: 0,);
                               }
                             },
                           );

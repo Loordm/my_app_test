@@ -258,7 +258,7 @@ class _InfoGroupeState extends State<InfoGroupe> {
                               ),
                             ),
                             onPressed: (){
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => DeplacementSurLaCarte(widget.idGroupe,listIdUsers),));
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => DeplacementSurLaCarte(widget.idGroupe),));
                             },
                             child: Text(
                               'Consulter le déplacement sur la carte',

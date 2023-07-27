@@ -17,9 +17,8 @@ import 'package:http/http.dart' as http;
 
 class DeplacementSurLaCarte extends StatefulWidget {
   String idGroupe;
-  List<String> listIdUsers;
 
-  DeplacementSurLaCarte(this.idGroupe, this.listIdUsers);
+  DeplacementSurLaCarte(this.idGroupe);
 
   @override
   State<DeplacementSurLaCarte> createState() => _DeplacementSurLaCarteState();
@@ -250,6 +249,9 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
   @override
   void initState() {
     super.initState();
+    print('=========================');
+    print('idGroupe = ${widget.idGroupe}');
+    print('=========================');
     _getCurrentPosition();
   }
 
@@ -313,7 +315,7 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            color: Colors.black,
+            color: Colors.white,
             size: screenWidth / 10,
           ),
           onPressed: () {
@@ -358,6 +360,9 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
                   ['secondaryText']);
               // get le proprietaire du groupe
               idOwner = snapshot.data!['owner']['identifiant'];
+              print('************************************');
+              print('idOwner = $idOwner');
+              print('************************************');
               // get les membres du groupe
               List<Map<String, dynamic>> membersData = (snapshot
                   .data!['membres'] as List<dynamic>).cast<
@@ -375,8 +380,11 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
                 for (Utilisateur u in membres) {
                   listIdUsers.add(u.identifiant);
                 }
-                listIdUsers.add(idOwner); // to find it in the condition where
               }
+              listIdUsers.add(idOwner); // to find it in the condition
+              print('************************************');
+              print('listIdUsers = $listIdUsers');
+              print('************************************');
               // le 2eme StreamBuilder pour get les utilisateurs qui appartient au ce groupe par les id precedentes
               return StreamBuilder<QuerySnapshot>(
                 stream: utilisateurCollection.snapshots(),
@@ -402,11 +410,19 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
                           // si ce utilisateur est le owner
                           // et il faut qu'il fait partie du groupe
                           owner = utilisateur;
+                          print('************************************');
+                          print('owner info : ${owner.identifiant}, ${owner.email}');
+                          print('************************************');
                         } else if (utilisateur.identifiant != idOwner &&
                             listIdUsers.contains(utilisateur.identifiant)) {
                           // si ce utilisateur est un membre
                           // et il faut qu'il fait partie du groupe
                           resteUsers.add(utilisateur);
+                        }
+                        for (Utilisateur s in resteUsers){
+                          print('************************************');
+                          print('membre info : ${s.identifiant}, ${s.email}');
+                          print('************************************');
                         }
                       }
                     }
@@ -456,6 +472,9 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
                     mainText: '',
                     secondaryText: ''
                 );
+                print('****************************************');
+                print('LatLng Owner : ${latLngPositionActuelOwner.latitude},${latLngPositionActuelOwner.longitude}');
+                print('****************************************');
                 lieuActuel = await getPlaceFromLatLng(
                     latLngPositionActuelOwner.latitude,
                     latLngPositionActuelOwner.longitude);
