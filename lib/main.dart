@@ -1,4 +1,5 @@
 import 'package:app_test/MyAppPages/Connexion.dart';
+import 'package:app_test/MyAppPages/Creer%20un%20groupe.dart';
 import 'package:app_test/MyAppPages/Inscription.dart';
 import 'package:app_test/MyAppPages/MesGroupes.dart';
 import 'package:app_test/MyAppPages/MesInvitations.dart';
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
         MesGroupes.screenRoute: (context) => MesGroupes(),
         MesInvitations.screenRoute: (context) => MesInvitations(),
         MonProfile.screenRoute: (context) => MonProfile(),
+        CreerGroupe.screenRoute: (context) => CreerGroupe(),
       },
     );
   }

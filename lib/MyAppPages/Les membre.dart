@@ -185,9 +185,6 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
               .doc(widget.idGroupe)
               .snapshots(),
           builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            }
             if (!snapshot.hasData) {
               return Text('Il n\'existe aucun membre');
             } else {

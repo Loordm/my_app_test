@@ -146,9 +146,6 @@ class _InfoGroupeState extends State<InfoGroupe> {
                     .doc(widget.idGroupe)
                     .snapshots(),
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  }
                   if (!snapshot.hasData) {
                     return Text('Il n\'existe aucun groupe');
                   } else {
@@ -182,7 +179,7 @@ class _InfoGroupeState extends State<InfoGroupe> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             Text(
-                              'Destination',
+                              'Déstination',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,

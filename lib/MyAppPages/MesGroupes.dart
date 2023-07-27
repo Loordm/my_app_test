@@ -1,13 +1,11 @@
 import 'package:app_test/MyAppClasses/Groupe.dart';
-import 'package:app_test/MyAppPages/Connexion.dart';
+import 'package:app_test/MyAppPages/Creer%20un%20groupe.dart';
 import 'package:app_test/Services/CloudFirestoreMethodes.dart';
-import 'package:app_test/Services/auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:places_service/places_service.dart';
-import '../MyAppClasses/Invitation.dart';
 import '../MyAppClasses/Utilisateur.dart';
 import 'Informations du groupe.dart';
 
@@ -35,15 +33,14 @@ class _MesGroupesState extends State<MesGroupes> {
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     final double screenWidth = screenSize.width;
-    final double screenHeight = screenSize.height;
     final padding = MediaQuery.of(context).padding;
-    final double textSize = 16;
+    const double textSize = 16;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Align(
+        title: const Align(
           alignment: Alignment.center,
           child: Text(
             'Mes groupes',
@@ -64,11 +61,8 @@ class _MesGroupesState extends State<MesGroupes> {
                 .collection('Groupes')
                 .snapshots(),
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              }
               if (!snapshot.hasData) {
-                return Text('Il n\'existe aucun groupe');
+                return const Text('Il n\'existe aucun groupe');
               } else {
                 final allGroupes = snapshot.data!.docs;
                 List<Groupe> groupesList = [];
@@ -127,7 +121,7 @@ class _MesGroupesState extends State<MesGroupes> {
                               width: screenWidth,
                               height: 200,
                               padding: padding,
-                              margin: EdgeInsets.all(24),
+                              margin: const EdgeInsets.all(24),
                               child: Column(
                                 children: [
                                   Align(
@@ -139,18 +133,18 @@ class _MesGroupesState extends State<MesGroupes> {
                                         children: [
                                           Text(
                                             '${groupe.lieuArrivee.description}',
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                                 fontSize: textSize,
                                                 fontFamily: 'Poppins',
                                                 color: Colors.black,
                                                 fontWeight: FontWeight.bold),
                                           ),
-                                          SizedBox(
+                                          const SizedBox(
                                             height: 10,
                                           ),
                                           Text(
                                             '${groupe.dateDepart.day}/${groupe.dateDepart.month}/${groupe.dateDepart.year}',
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                                 fontSize: textSize,
                                                 fontFamily: 'Poppins',
                                                 color: Colors.black,
@@ -160,7 +154,7 @@ class _MesGroupesState extends State<MesGroupes> {
                                       ),
                                     ),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 10,
                                   ),
                                   Column(
@@ -170,21 +164,21 @@ class _MesGroupesState extends State<MesGroupes> {
                                     children: [
                                       groupe.owner.identifiant ==
                                               auth.currentUser!.uid
-                                          ? Text(
+                                          ? const Text(
                                               'Vous êtes le propriétaire',
                                               style: TextStyle(
                                                   fontSize: textSize,
                                                   fontFamily: 'Poppins',
                                                   color: Colors.black),
                                             )
-                                          : Text(
+                                          : const Text(
                                               'Vous êtes un membre',
                                               style: TextStyle(
                                                   fontSize: textSize,
                                                   fontFamily: 'Poppins',
                                                   color: Colors.black),
                                             ),
-                                      SizedBox(
+                                      const SizedBox(
                                         height: 10,
                                       ),
                                       ElevatedButton(
@@ -210,14 +204,14 @@ class _MesGroupesState extends State<MesGroupes> {
                                         },
                                         child: groupe.owner.identifiant ==
                                                 auth.currentUser!.uid
-                                            ? Text(
+                                            ? const Text(
                                                 'Supprimer ce groupe',
                                                 style: TextStyle(
                                                     fontFamily: 'Poppins',
                                                     fontSize: 14,
                                                     color: Colors.white),
                                               )
-                                            : Text(
+                                            : const Text(
                                                 'Quitter ce groupe',
                                                 style: TextStyle(
                                                     fontFamily: 'Poppins',
@@ -233,7 +227,7 @@ class _MesGroupesState extends State<MesGroupes> {
                           );
                         },
                       )
-                    : Center(
+                    : const Center(
                         child: Text(
                           'Vous n\'avez aucun groupe pour le moment',
                           style: TextStyle(
@@ -247,13 +241,13 @@ class _MesGroupesState extends State<MesGroupes> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
-          await AuthService().signOut();
-          Navigator.pushNamedAndRemoveUntil(context, Connexion.screenRoute, (route) => false);
+          Navigator.pushNamed(context, CreerGroupe.screenRoute);
         },
-        child: Icon(Icons.add),
+        icon: const Icon(Icons.add),
         backgroundColor: Colors.indigoAccent[400],
+        label: const Text('Ajouter un groupe',style: TextStyle(fontFamily: 'Poppins',fontSize: 12),),
       ),
     );
   }

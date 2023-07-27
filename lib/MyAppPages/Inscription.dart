@@ -1,10 +1,10 @@
 import 'package:app_test/MyAppClasses/Utilisateur.dart';
 import 'package:app_test/MyAppPages/Connexion.dart';
-import 'package:app_test/MyAppPages/MesGroupes.dart';
 import 'package:app_test/Services/CloudFirestoreMethodes.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../Services/auth.dart';
+import 'Acceuil.dart';
 import 'Loading.dart';
 class Inscription extends StatefulWidget {
   static const String screenRoute = '/inscription' ;
@@ -18,10 +18,10 @@ class _InscriptionState extends State<Inscription> {
   bool _isObscured = false ;
   final AuthService _auth = AuthService();
   final CloudFirestoreMethodes _cfm = CloudFirestoreMethodes();
-  TextEditingController _nomCompletController = TextEditingController();
-  TextEditingController _numeroDeTelephoneController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _motDePasseController = TextEditingController();
+  final _nomCompletController = TextEditingController();
+  final _numeroDeTelephoneController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _motDePasseController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
@@ -175,31 +175,29 @@ class _InscriptionState extends State<Inscription> {
                                 builder: (context) =>
                                     Loading()),
                           );
-                          print('******************************************');
-                          print('Nom complet : ${_nomCompletController.text}');
-                          print('numero : ${_numeroDeTelephoneController.text}');
-                          print('email : ${_emailController.text}');
-                          print('mot de passe : ${_motDePasseController.text}');
-                          print('******************************************');
-                          Utilisateur utilisateur = Utilisateur(identifiant: '', nomComplet: _nomCompletController.text, email: _emailController.text, numeroDeTelephone: _numeroDeTelephoneController.text,imageUrl: 'https://imgv3.fotor.com/images/blog-richtext-image/10-profile-picture-ideas-to-make-you-stand-out.jpg', positionActuel: const LatLng(0,0));
+                          Utilisateur utilisateur = Utilisateur(
+                              identifiant: '',
+                              nomComplet: _nomCompletController.text,
+                              email: _emailController.text,
+                              numeroDeTelephone: _numeroDeTelephoneController.text,
+                              imageUrl: 'https://imgv3.fotor.com/images/blog-richtext-image/10-profile-picture-ideas-to-make-you-stand-out.jpg',
+                              positionActuel: const LatLng(0,0)
+                          );
                           dynamic result = await _auth.signUp(
                               _emailController.text,
                               _motDePasseController.text,
                               utilisateur);
-                          print('******************************************');
-                          print('result = $result');
-                          print('******************************************');
                           if (result == null) {
                             Navigator.pop(context);
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text('Cette adresse email est déja utilisé'),
+                                content: Text('Cette adresse email est déja utilisé ou cette email est fausse'),
                               ),
                             );
                           } else {
                             utilisateur.identifiant = result!.uid ;
                             await _cfm.creerUtilisateur(utilisateur);
-                            Navigator.pushNamedAndRemoveUntil(context, MesGroupes.screenRoute, (route) => false);
+                            Navigator.pushNamedAndRemoveUntil(context, Acceuil.screenRoute, (route) => false);
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 duration: Duration(seconds: 2),
@@ -208,17 +206,17 @@ class _InscriptionState extends State<Inscription> {
                             );
                           }
                         },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.indigoAccent[400],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24), // Border radius of the button
+                          ),
+                        ),
                         child: const Text(
                           'S\'inscrire',
                           style: TextStyle(
                             fontFamily: 'Poppins',
                             fontSize: 18,
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.indigoAccent[400],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24), // Border radius of the button
                           ),
                         ),
                       ),

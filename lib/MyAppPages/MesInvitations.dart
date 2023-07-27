@@ -23,14 +23,11 @@ class _MesInvitationsState extends State<MesInvitations> {
       FirebaseFirestore.instance.collection('Utilisateur');
   final FirebaseAuth auth = FirebaseAuth.instance;
   final _cloudFirestore = CloudFirestoreMethodes();
-  bool dejaTraite = false ;
-  bool accepte_refuse = false ;
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     final double screenWidth = screenSize.width;
     final double screenHeight = screenSize.height;
-    final padding = MediaQuery.of(context).padding;
     return Scaffold(
         extendBodyBehindAppBar: true,
         appBar: AppBar(
@@ -54,9 +51,6 @@ class _MesInvitationsState extends State<MesInvitations> {
             stream:
                 utilisateurCollection.doc(auth.currentUser!.uid).snapshots(),
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              }
               if (!snapshot.hasData) {
                 return Center(
                   child: Text(
@@ -98,15 +92,9 @@ class _MesInvitationsState extends State<MesInvitations> {
                           .doc(invitation.idEnvoyeur)
                           .snapshots(),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        }
                         if (!snapshot.hasData) {
                           return Center();
                         } else {
-                          dejaTraite = invitation.dejaTraite;
-                          accepte_refuse = invitation.acceptation;
                           Utilisateur utilisateur =
                               Utilisateur.creerUtilisateurVide();
                           utilisateur.identifiant =
@@ -124,11 +112,6 @@ class _MesInvitationsState extends State<MesInvitations> {
                                 .doc(invitation.idGroupe)
                                 .snapshots(),
                             builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Center(
-                                    child: CircularProgressIndicator());
-                              }
                               if (!snapshot.hasData) {
                                 return Center();
                               } else {
@@ -168,7 +151,7 @@ class _MesInvitationsState extends State<MesInvitations> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   width: screenWidth,
-                                  height: (!dejaTraite) ? screenHeight/2.6 : screenHeight/3.2,
+                                  height: (!invitations[index].dejaTraite) ? screenHeight/2.6 : screenHeight/3.2,
                                   padding: EdgeInsets.fromLTRB(4, 8, 4, 0),
                                   margin: EdgeInsets.symmetric(horizontal: 24,vertical: 24),
                                   child: Column(
@@ -251,7 +234,7 @@ class _MesInvitationsState extends State<MesInvitations> {
                                               ),
                                             ),
                                             SizedBox(height: 12,),
-                                            (!dejaTraite) ? Column(
+                                            (!invitations[index].dejaTraite) ? Column(
                                               children: [
                                                 Container(
                                                   width: screenWidth,
@@ -265,11 +248,12 @@ class _MesInvitationsState extends State<MesInvitations> {
                                                       ),
                                                     ),
                                                     onPressed: () async{
+                                                      setState(() {
+                                                        invitations[index].dejaTraite = true ;
+                                                        invitations[index].acceptation= true ;
+                                                      });
                                                       await _cloudFirestore.modifierInvitation(auth.currentUser!.uid, index, true);
                                                       await _cloudFirestore.ajouterGroupe(auth.currentUser!.uid, groupe);
-                                                      print('****************************************');
-                                                      print('idGroupe = ${invitation.idGroupe}');
-                                                      print('****************************************');
                                                       await _cloudFirestore.ajouterUtilisateurAuGroupe(groupe.owner.identifiant, invitation.idGroupe, currentUser);
                                                     },
                                                     child: Container(
@@ -314,6 +298,10 @@ class _MesInvitationsState extends State<MesInvitations> {
                                                       ),
                                                     ),
                                                     onPressed: () async{
+                                                      setState(() {
+                                                        invitations[index].dejaTraite = true;
+                                                        invitations[index].acceptation= false ;
+                                                      });
                                                       await _cloudFirestore.modifierInvitation(auth.currentUser!.uid, index, false);
                                                     },
                                                     child: Row(
@@ -348,12 +336,12 @@ class _MesInvitationsState extends State<MesInvitations> {
                                               padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
                                               decoration: BoxDecoration(
                                                 borderRadius: BorderRadius.circular(20),
-                                                color: (accepte_refuse) ? Colors.green[100] : Colors.red[100],
+                                                color: (invitations[index].acceptation) ? Colors.green[100] : Colors.red[100],
                                               ),
                                               child: Row(
                                                 mainAxisAlignment: MainAxisAlignment.center,
                                                 children: [
-                                                  (accepte_refuse) ? Icon(
+                                                  (invitations[index].acceptation) ? Icon(
                                                     Icons.check_circle,
                                                     size: 40,
                                                     color: Colors.green,
@@ -365,7 +353,7 @@ class _MesInvitationsState extends State<MesInvitations> {
                                                     color: Colors.red,
 
                                                   ),
-                                                  (accepte_refuse) ? Text("L\'invitation a été acceptée",
+                                                  (invitations[index].acceptation) ? Text("L\'invitation a été acceptée",
                                                     style: TextStyle(
                                                       fontSize: 16,
                                                       color: Colors.green,

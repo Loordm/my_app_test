@@ -58,9 +58,6 @@ class _MonProfileState extends State<MonProfile> {
           child: StreamBuilder(
             stream: utilisateurCollection.doc(auth.currentUser!.uid).snapshots(),
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: Align(alignment: Alignment.center,child: CircularProgressIndicator()));
-              }
               if (!snapshot.hasData) {
                 return Text('Cette utilisateur n\'existe pas');
               } else {
@@ -98,6 +95,16 @@ class _MonProfileState extends State<MonProfile> {
                         : CircularProgressIndicator(),
                       ],
                     ),
+                    SizedBox(height: 4,),
+                    Text(
+                      '${utilisateur.email}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'Poppins',
+                        color: Colors.black
+                      ),
+                    ),
+                    SizedBox(height: 10,),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -262,7 +269,7 @@ class _MonProfileState extends State<MonProfile> {
                         ),
                       ),
                     ),
-                    SizedBox(height: screenHeight/12,),
+                    SizedBox(height: screenHeight/26,),
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: TextButton(

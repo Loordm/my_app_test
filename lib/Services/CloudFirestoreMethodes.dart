@@ -32,6 +32,7 @@ class CloudFirestoreMethodes {
     });
   }
   Future<void>modifierInvitation(String uid, int index, bool accepter) async {
+    int i = 0 ;
     List<Invitation> listeInvitation = [];
     await _utilisateurCollection
         .doc(uid)
@@ -47,9 +48,12 @@ class CloudFirestoreMethodes {
               acceptation: invitationData['acceptation'],
               dejaTraite: invitationData['dejaTraite'],
             );
-            invitation.dejaTraite = true;
-            invitation.acceptation = accepter;
+            if (i == index) {
+              invitation.dejaTraite = true;
+              invitation.acceptation = accepter;
+            }
             listeInvitation.add(invitation);
+            i++ ;
           }
       }
   });
@@ -60,16 +64,14 @@ class CloudFirestoreMethodes {
 
   Future<void> ajouterGroupe(String uid, Groupe groupe) async {
     Map<String, dynamic> groupeData = groupe.toMap();
-    DocumentReference docRef = await FirebaseFirestore.instance
-        .collection('Utilisateur')
+    DocumentReference docRef = await _utilisateurCollection
         .doc(uid)
         .collection('Groupes')
         .add(groupeData);
     // sauvegarder le groupe id
     groupe.idGroupe = docRef.id;
     groupeData = groupe.toMap();
-    await FirebaseFirestore.instance
-        .collection('Utilisateur')
+    await _utilisateurCollection
         .doc(uid)
         .collection('Groupes')
         .doc(docRef.id)
