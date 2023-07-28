@@ -53,8 +53,8 @@ class Utilisateur{
   void supprimerGroupe(int index){
     _groupes.remove(index);
   }
-  void ajouterUtilisateurAuGroupe(int indexGroupe, Utilisateur utilisateur){
-    _groupes[indexGroupe].ajouterUnMembre(utilisateur);
+  void ajouterUtilisateurAuGroupe(int indexGroupe, String idUtilisateur){
+    _groupes[indexGroupe].ajouterUnMembre(idUtilisateur);
   }
   void supprimerUtilisateurDuGroupe(int indexGroupe, int indexUtilisateur){
     _groupes[indexGroupe].supprimerUnMembre(indexUtilisateur);

@@ -3,18 +3,18 @@ import 'package:app_test/Services/CloudFirestoreMethodes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:places_service/places_service.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import '../MyAppClasses/Invitation.dart';
 import '../MyAppClasses/Utilisateur.dart';
 
 class ConsulterLesMembres extends StatefulWidget {
   String idGroupe;
-
   bool estProprietaire;
+  String idGroupeOwner;
 
-  ConsulterLesMembres(this.idGroupe, this.estProprietaire);
+  String idOwner;
+
+  ConsulterLesMembres(
+      this.idGroupe, this.estProprietaire, this.idGroupeOwner, this.idOwner);
 
   @override
   State<ConsulterLesMembres> createState() => _ConsulterLesMembresState();
@@ -33,14 +33,17 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
   final FirebaseAuth auth = FirebaseAuth.instance;
   final _cloudFirestore = CloudFirestoreMethodes();
   Groupe groupe = Groupe.creerGroupeVide();
+  List<String> listIdUsers = [];
+  String idOwner = '';
+  Utilisateur owner = Utilisateur.creerUtilisateurVide();
+  List<Utilisateur> resteUsers = [];
+  List<Widget> listMembersWidget = [];
 
-  @override
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     final double screenWidth = screenSize.width;
     final double screenHeight = screenSize.height;
-    final padding = MediaQuery.of(context).padding;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -172,58 +175,84 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
         ],
       ),
       backgroundColor: Colors.grey[300],
-      body: SafeArea(
-        child: StreamBuilder<DocumentSnapshot>(
-          stream: utilisateurCollection
-              .doc(auth.currentUser!.uid)
-              .collection('Groupes')
-              .doc(widget.idGroupe)
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return Text('Il n\'existe aucun membre');
-            } else {
-              if (snapshot.data!.exists) {
-                // get les informations du goupe
-                DateTime dateDepart = snapshot.data!['dateDepart'].toDate();
-                PlacesAutoCompleteResult lieuArrivee = PlacesAutoCompleteResult(
-                    placeId: snapshot.data!['lieuArrivee']['placeId'],
-                    description: snapshot.data!['lieuArrivee']['description'],
-                    mainText: snapshot.data!['lieuArrivee']['mainText'],
-                    secondaryText: snapshot.data!['lieuArrivee']
-                        ['secondaryText']);
-                groupe.idGroupe = widget.idGroupe;
-                groupe.dateDepart = dateDepart;
-                groupe.lieuArrivee = lieuArrivee;
+      body: SingleChildScrollView(
+        child: SafeArea(
+          // 1) get all users ids from the groupe members
+          child: StreamBuilder<DocumentSnapshot>(
+            stream: utilisateurCollection
+                .doc(widget.idOwner)
+                .collection('Groupes')
+                .doc(widget.idGroupeOwner)
+                .snapshots(),
+            builder: (context, snapshot) {
+              listIdUsers.clear();
+              resteUsers.clear();
+              listMembersWidget.clear();
+              idOwner = '';
+              if (snapshot.hasData && snapshot.data != null) {
                 // get le proprietaire du groupe
-                groupe.owner.identifiant =
-                    snapshot.data!['owner']['identifiant'];
-                groupe.owner.email = snapshot.data!['owner']['email'];
-                groupe.owner.numeroDeTelephone =
-                    snapshot.data!['owner']['numeroDeTelephone'];
-                groupe.owner.nomComplet = snapshot.data!['owner']['nomComplet'];
-                groupe.owner.imageUrl = snapshot.data!['owner']['imageUrl'];
+                idOwner = snapshot.data!['idOwner'];
                 // get les membres du groupe
-                List<Map<String, dynamic>> membersData =
-                    (snapshot.data!['membres'] as List<dynamic>)
-                        .cast<Map<String, dynamic>>();
-                if (membersData.isNotEmpty) {
-                  List<Utilisateur> membres = membersData.map((memberData) {
-                    return Utilisateur(
-                        identifiant: memberData['identifiant'],
-                        email: memberData['email'],
-                        numeroDeTelephone: memberData['numeroDeTelephone'],
-                        imageUrl: memberData['imageUrl'],
-                        nomComplet: memberData['nomComplet'],
-                        positionActuel: LatLng(0, 0));
-                  }).toList();
-                  groupe.membres = membres;
+                Map<String, dynamic> membresData =
+                    snapshot.data!.data() as Map<String, dynamic>;
+                if (membresData.isNotEmpty) {
+                  listIdUsers = List<String>.from(membresData['membres']);
                 }
-                return Column(
-                  children: [
-                    SizedBox(height: 20),
-                    (!widget.estProprietaire)
-                        ? Column(
+                listIdUsers.add(idOwner);
+                return StreamBuilder<QuerySnapshot>(
+                  stream: utilisateurCollection.snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return Center(child: const Text('Il n\'existe aucun membre'));
+                    } else {
+                      resteUsers.clear();
+                      listMembersWidget.clear();
+                      final allUsers = snapshot.data!.docs;
+                      int i = 0 ;
+                      for (var u in allUsers) {
+                        if (listIdUsers.contains(u['identifiant'])) {
+                          if (u.exists) {
+                            Utilisateur utilisateur =
+                            Utilisateur.creerUtilisateurVide();
+                            utilisateur.identifiant = u['identifiant'];
+                            utilisateur.nomComplet = u['nomComplet'];
+                            utilisateur.email = u['email'];
+                            utilisateur.numeroDeTelephone =
+                            u['numeroDeTelephone'];
+                            utilisateur.imageUrl = u['imageUrl'];
+                            if (utilisateur.identifiant == idOwner &&
+                                listIdUsers
+                                    .contains(utilisateur.identifiant)) {
+                              // si ce utilisateur est le owner
+                              // et il faut qu'il fait partie du groupe
+                              owner = Utilisateur.creerUtilisateurVide();
+                              owner = utilisateur;
+                            } else if (utilisateur.identifiant !=
+                                idOwner &&
+                                listIdUsers
+                                    .contains(utilisateur.identifiant)) {
+                              // si ce utilisateur est un membre
+                              // et il faut qu'il fait partie du groupe
+                              resteUsers.add(utilisateur);
+                              listMembersWidget.add(InfoUserContainer(
+                                  utilisateur.imageUrl,
+                                  utilisateur.nomComplet,
+                                  utilisateur.email,
+                                  utilisateur.numeroDeTelephone,
+                                  true,
+                                  i,
+                                  groupe.idGroupe)
+                              );
+                              i++;
+                            }
+                          }
+                        }
+                      }
+                      return Column(
+                        children: [
+                          SizedBox(height: 20),
+                          (!widget.estProprietaire)
+                              ? Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -242,16 +271,16 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                                 height: 10,
                               ),
                               InfoUserContainer(
-                                  groupe.owner.imageUrl,
-                                  groupe.owner.nomComplet,
-                                  groupe.owner.email,
-                                  groupe.owner.numeroDeTelephone,
+                                  owner.imageUrl,
+                                  owner.nomComplet,
+                                  owner.email,
+                                  owner.numeroDeTelephone,
                                   false,
                                   0,
                                   ''),
                             ],
                           )
-                        : Text(
+                              : Text(
                             textAlign: TextAlign.center,
                             'Vous êtes le propriétaire',
                             style: TextStyle(
@@ -259,11 +288,11 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                                 fontFamily: 'Poppins',
                                 color: Colors.black),
                           ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    (groupe.membres.isNotEmpty)
-                        ? Padding(
+                          SizedBox(
+                            height: 10,
+                          ),
+                          (resteUsers.isNotEmpty)
+                              ? Padding(
                             padding: const EdgeInsets.fromLTRB(24, 8, 4, 0),
                             child: Align(
                               alignment: Alignment.centerLeft,
@@ -277,7 +306,7 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                               ),
                             ),
                           )
-                        : Center(
+                              : Center(
                             child: Text(
                               'Aucun membre pour le moment',
                               style: TextStyle(
@@ -286,29 +315,25 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                                   color: Colors.black),
                             ),
                           ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Expanded(
-                      child: ListView.builder(
-                          itemCount: groupe.membres.length,
-                          itemBuilder: (context, index) {
-                            final membreAffiche = groupe.membres[index];
-                            return InfoUserContainer(
-                                membreAffiche.imageUrl,
-                                membreAffiche.nomComplet,
-                                membreAffiche.email,
-                                membreAffiche.numeroDeTelephone,
-                                true,
-                                index,
-                                groupe.idGroupe);
-                          }),
-                    ),
-                  ],
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Column(
+                            children: listMembersWidget,
+                          ),
+                        ],
+                      );
+                    }
+                  },
                 );
-              }else return SizedBox(width: 0,height: 0,);
-            }
-          },
+              } else {
+                return const SizedBox(
+                  width: 0,
+                  height: 0,
+                );
+              }
+            },
+          ),
         ),
       ),
     );
@@ -444,10 +469,14 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                           actions: [
                             TextButton(
                               onPressed: () async {
+                                print('**********************************************');
+                                print('index = $index');
+                                print('widget.idGroupeOwner = ${widget.idGroupeOwner}');
+                                print('**********************************************');
                                 await _cloudFirestore
                                     .supprimerUtilisateurAuGroupe(
                                         auth.currentUser!.uid,
-                                        uidGroupe,
+                                        widget.idGroupeOwner,
                                         index);
                                 Navigator.of(context).pop();
                               },

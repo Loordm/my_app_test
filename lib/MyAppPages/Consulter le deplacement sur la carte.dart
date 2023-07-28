@@ -17,8 +17,9 @@ import 'package:http/http.dart' as http;
 
 class DeplacementSurLaCarte extends StatefulWidget {
   String idGroupe;
-
-  DeplacementSurLaCarte(this.idGroupe);
+  String idGroupeOwner ;
+  String idOwner ;
+  DeplacementSurLaCarte(this.idGroupe,this.idGroupeOwner,this.idOwner);
 
   @override
   State<DeplacementSurLaCarte> createState() => _DeplacementSurLaCarteState();
@@ -250,9 +251,6 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
   @override
   void initState() {
     super.initState();
-    print('=========================');
-    print('idGroupe = ${widget.idGroupe}');
-    print('=========================');
     _getCurrentPosition();
   }
 
@@ -338,9 +336,9 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
               // le premier StreamBuilder pour get les id de chaque utilisateur dans le groupe
               child: StreamBuilder<DocumentSnapshot>(
                 stream: utilisateurCollection
-                    .doc(auth.currentUser!.uid)
+                    .doc(widget.idOwner)
                     .collection('Groupes')
-                    .doc(widget.idGroupe)
+                    .doc(widget.idGroupeOwner)
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
@@ -349,7 +347,6 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
                     listIdUsers.clear();
                     resteUsers.clear();
                     idOwner = '';
-                    owner = Utilisateur.creerUtilisateurVide();
                     if (snapshot.data!.exists) {
                       // get les informations du groupe
                       lieuArrivee = PlacesAutoCompleteResult(
@@ -360,34 +357,14 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
                           secondaryText: snapshot.data!['lieuArrivee']
                               ['secondaryText']);
                       // get le proprietaire du groupe
-                      idOwner = snapshot.data!['owner']['identifiant'];
+                      idOwner = snapshot.data!['idOwner'];
                       print('************************************');
                       print('idOwner = $idOwner');
                       print('************************************');
                       // get les membres du groupe
-                      List<Map<String, dynamic>> membersData =
-                          (snapshot.data!['membres'] as List<dynamic>)
-                              .cast<Map<String, dynamic>>();
-                      if (membersData.isNotEmpty) {
-                        List<Utilisateur> membres =
-                            membersData.map((memberData) {
-                          return Utilisateur(
-                              identifiant: memberData['identifiant'],
-                              email: memberData['email'],
-                              numeroDeTelephone:
-                                  memberData['numeroDeTelephone'],
-                              imageUrl: memberData['imageUrl'],
-                              nomComplet: memberData['nomComplet'],
-                              positionActuel: const LatLng(0, 0));
-                        }).toList();
-                        for (Utilisateur u in membres) {
-                          listIdUsers.add(u.identifiant);
-                          print(
-                              '*********************************************');
-                          print('id membre : ${u.identifiant}');
-                          print(
-                              '*********************************************');
-                        }
+                      Map<String, dynamic> membresData = snapshot.data!.data() as Map<String, dynamic>;
+                      if (membresData.isNotEmpty){
+                        listIdUsers = List<String>.from(membresData['membres']);
                       }
                       listIdUsers.add(idOwner); // to find it in the condition
                       print('************************************');
@@ -421,6 +398,7 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
                                           .contains(utilisateur.identifiant)) {
                                     // si ce utilisateur est le owner
                                     // et il faut qu'il fait partie du groupe
+                                    owner = Utilisateur.creerUtilisateurVide();
                                     owner = utilisateur;
                                     print(
                                         '************************************');
@@ -463,8 +441,9 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
                           }
                         },
                       );
-                    } else
+                    } else {
                       return const SizedBox(width: 0, height: 0);
+                    }
                   }
                 },
               ),
@@ -550,7 +529,7 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
                 _boutonvisible = false;
               });
             },
-            child: Container(
+            child: SizedBox(
               width: screenWidth / 2,
               height: 60,
               child: Align(

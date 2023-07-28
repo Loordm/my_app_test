@@ -134,7 +134,7 @@ class _ConnexionState extends State<Connexion> {
                             Navigator.pop(context);
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text('Veuillez vérifier vos données'),
+                                content: Text('Veuillez vérifier vos données ou bien vérifier votre connexion'),
                               ),
                             );
                           }else {

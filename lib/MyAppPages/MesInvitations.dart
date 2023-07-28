@@ -3,7 +3,6 @@ import 'package:app_test/MyAppClasses/Utilisateur.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:places_service/places_service.dart';
 
 import '../MyAppClasses/Invitation.dart';
@@ -33,7 +32,7 @@ class _MesInvitationsState extends State<MesInvitations> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          title: Align(
+          title: const Align(
             alignment: Alignment.center,
             child: Text(
               'Mes Invitations',
@@ -52,7 +51,7 @@ class _MesInvitationsState extends State<MesInvitations> {
                 utilisateurCollection.doc(auth.currentUser!.uid).snapshots(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
-                return Center(
+                return const Center(
                   child: Text(
                     'Vous n\'avez aucune invitation pour le moment',
                     style: TextStyle(
@@ -63,12 +62,6 @@ class _MesInvitationsState extends State<MesInvitations> {
                 );
               } else {
                 final data = snapshot.data!.data() as Map<String, dynamic>;
-                Utilisateur currentUser = Utilisateur.creerUtilisateurVide();
-                currentUser.identifiant = data['identifiant'];
-                currentUser.email = data['email'];
-                currentUser.nomComplet = data['nomComplet'];
-                currentUser.numeroDeTelephone = data['numeroDeTelephone'];
-                currentUser.imageUrl = data['imageUrl'];
                 List<Invitation> invitations = [];
                 if (data['invitations'] != null) {
                   List<dynamic> invitationsData = data['invitations'];
@@ -93,7 +86,7 @@ class _MesInvitationsState extends State<MesInvitations> {
                           .snapshots(),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
-                          return Center();
+                          return const Center();
                         } else {
                           Utilisateur utilisateur =
                               Utilisateur.creerUtilisateurVide();
@@ -113,11 +106,11 @@ class _MesInvitationsState extends State<MesInvitations> {
                                 .snapshots(),
                             builder: (context, snapshot) {
                               if (!snapshot.hasData) {
-                                return Center();
+                                return const Center();
                               }
                               else if (snapshot.connectionState == ConnectionState.waiting) {
                                 // While data is loading
-                                return CircularProgressIndicator();
+                                return const CircularProgressIndicator();
                               }
                               else if (snapshot.hasError) {
                                 // Handle the error
@@ -126,8 +119,7 @@ class _MesInvitationsState extends State<MesInvitations> {
                               else {
                                 if (snapshot.data!.exists) {
                                   Groupe groupe = Groupe.creerGroupeVide();
-                                  DateTime dateDepart = snapshot
-                                      .data!['dateDepart'].toDate();
+                                  DateTime dateDepart = snapshot.data!['dateDepart'].toDate();
                                   PlacesAutoCompleteResult lieuArrivee = PlacesAutoCompleteResult(
                                       placeId: snapshot
                                           .data!['lieuArrivee']['placeId'],
@@ -140,32 +132,13 @@ class _MesInvitationsState extends State<MesInvitations> {
                                       ['secondaryText']);
                                   groupe.lieuArrivee = lieuArrivee;
                                   groupe.dateDepart = dateDepart;
-                                  // get owner
-                                  groupe.owner.identifiant =
-                                  snapshot.data!['owner']['identifiant'];
-                                  groupe.owner.email =
-                                  snapshot.data!['owner']['email'];
-                                  groupe.owner.numeroDeTelephone =
-                                  snapshot.data!['owner']['numeroDeTelephone'];
-                                  groupe.owner.nomComplet =
-                                  snapshot.data!['owner']['nomComplet'];
-                                  groupe.owner.imageUrl =
-                                  snapshot.data!['owner']['imageUrl'];
-                                  List<Map<String,
-                                      dynamic>> membersData = (snapshot
-                                      .data!['membres'] as List<dynamic>).cast<
-                                      Map<String, dynamic>>();
+                                  // get id owner
+                                  groupe.idOwner = snapshot.data!['idOwner'] ;
+                                  groupe.idGroupeOwner = invitation.idGroupe;
+                                  Map<String, dynamic> membersData = snapshot.data!.data() as Map<String, dynamic>;
                                   if (membersData.isNotEmpty) {
-                                    List<Utilisateur> membres = membersData
-                                        .map((memberData) {
-                                      return Utilisateur(
-                                          identifiant: memberData['identifiant'],
-                                          email: memberData['email'],
-                                          numeroDeTelephone: memberData['numeroDeTelephone'],
-                                          imageUrl: memberData['imageUrl'],
-                                          nomComplet: memberData['nomComplet'],
-                                          positionActuel: LatLng(0, 0));
-                                    }).toList();
+                                    List<String> membres = [];
+                                    membres = List<String>.from(membersData['membres']);
                                     groupe.membres = membres;
                                   }
                                   return Container(
@@ -177,8 +150,8 @@ class _MesInvitationsState extends State<MesInvitations> {
                                     height: (!invitations[index].dejaTraite)
                                         ? screenHeight / 2.6
                                         : screenHeight / 3.2,
-                                    padding: EdgeInsets.fromLTRB(4, 8, 4, 0),
-                                    margin: EdgeInsets.symmetric(
+                                    padding: const EdgeInsets.fromLTRB(4, 8, 4, 0),
+                                    margin: const EdgeInsets.symmetric(
                                         horizontal: 24, vertical: 24),
                                     child: Column(
                                       children: [
@@ -191,7 +164,7 @@ class _MesInvitationsState extends State<MesInvitations> {
                                                 borderRadius: BorderRadius
                                                     .circular(100),
                                                 child: Image.network(
-                                                  '${utilisateur.imageUrl}',
+                                                  utilisateur.imageUrl,
                                                   fit: BoxFit.cover,
                                                   width: screenWidth / 7,
                                                   height: screenWidth / 7,
@@ -202,7 +175,7 @@ class _MesInvitationsState extends State<MesInvitations> {
                                                   Text(
                                                     '  ${utilisateur
                                                         .nomComplet}',
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                       fontSize: 16,
                                                       fontFamily: 'Poppins',
                                                       fontWeight: FontWeight
@@ -228,7 +201,7 @@ class _MesInvitationsState extends State<MesInvitations> {
                                                         width: screenWidth /
                                                             20,),
                                                       Text(
-                                                        '${utilisateur.email}',
+                                                        utilisateur.email,
                                                         style: TextStyle(
                                                           fontSize: 16,
                                                           fontFamily: 'Poppins',
@@ -245,7 +218,7 @@ class _MesInvitationsState extends State<MesInvitations> {
                                             ],
                                           ),
                                         ),
-                                        SizedBox(height: 6,),
+                                        const SizedBox(height: 6,),
                                         Padding(
                                           padding: const EdgeInsets.fromLTRB(
                                               8, 0, 8, 0),
@@ -255,7 +228,7 @@ class _MesInvitationsState extends State<MesInvitations> {
                                             crossAxisAlignment: CrossAxisAlignment
                                                 .center,
                                             children: [
-                                              Text(
+                                              const Text(
                                                 'Invitation pour rejoindre le groupe de Grine Mohammed pour allez vers :',
                                                 style: TextStyle(
                                                   fontSize: 16,
@@ -277,11 +250,11 @@ class _MesInvitationsState extends State<MesInvitations> {
                                                       .indigoAccent[400],
                                                 ),
                                               ),
-                                              SizedBox(height: 12,),
+                                              const SizedBox(height: 12,),
                                               (!invitations[index].dejaTraite)
                                                   ? Column(
                                                 children: [
-                                                  Container(
+                                                  SizedBox(
                                                     width: screenWidth,
                                                     height: 50,
                                                     child: ElevatedButton(
@@ -304,23 +277,13 @@ class _MesInvitationsState extends State<MesInvitations> {
                                                               .acceptation =
                                                           true;
                                                         });
-                                                        await _cloudFirestore
-                                                            .modifierInvitation(
-                                                            auth.currentUser!
-                                                                .uid, index,
-                                                            true);
-                                                        await _cloudFirestore
-                                                            .ajouterGroupe(
-                                                            auth.currentUser!
-                                                                .uid, groupe);
-                                                        await _cloudFirestore
-                                                            .ajouterUtilisateurAuGroupe(
-                                                            groupe.owner
-                                                                .identifiant,
-                                                            invitation.idGroupe,
-                                                            currentUser);
+                                                        await _cloudFirestore.modifierInvitation(auth.currentUser!.uid, index, true);
+                                                        await _cloudFirestore.ajouterGroupe(auth.currentUser!.uid, groupe,invitation.idGroupe);
+                                                        await _cloudFirestore.ajouterUtilisateurAuGroupe(groupe.idOwner, invitation.idGroupe, auth.currentUser!.uid);
+                                                        /// ajouter cet utilisateur a toutes les membres du groupe du owner
+
                                                       },
-                                                      child: Container(
+                                                      child: SizedBox(
                                                         width: screenWidth,
                                                         height: 50,
                                                         child: Row(
@@ -328,10 +291,10 @@ class _MesInvitationsState extends State<MesInvitations> {
                                                             Container(
                                                               color: Colors
                                                                   .green,
-                                                              child: Icon(
+                                                              child: const Icon(
                                                                   Icons.check),
                                                             ),
-                                                            SizedBox(width: 8),
+                                                            const SizedBox(width: 8),
                                                             Expanded(
                                                               child: Align(
                                                                 alignment: Alignment
@@ -356,7 +319,7 @@ class _MesInvitationsState extends State<MesInvitations> {
                                                   ),
                                                   SizedBox(
                                                     height: screenHeight / 40,),
-                                                  Container(
+                                                  SizedBox(
                                                     width: screenWidth,
                                                     height: 50,
                                                     child: ElevatedButton(
@@ -389,10 +352,10 @@ class _MesInvitationsState extends State<MesInvitations> {
                                                         children: [
                                                           Container(
                                                             color: Colors.red,
-                                                            child: Icon(
+                                                            child: const Icon(
                                                                 Icons.close),
                                                           ),
-                                                          SizedBox(width: 8),
+                                                          const SizedBox(width: 8),
                                                           Expanded(
                                                             child: Align(
                                                               alignment: Alignment
@@ -418,9 +381,9 @@ class _MesInvitationsState extends State<MesInvitations> {
                                               )
                                                   :
                                               Container(
-                                                margin: EdgeInsets.fromLTRB(
+                                                margin: const EdgeInsets.fromLTRB(
                                                     5, 0, 5, 0),
-                                                padding: EdgeInsets.fromLTRB(
+                                                padding: const EdgeInsets.fromLTRB(
                                                     0, 10, 0, 10),
                                                 decoration: BoxDecoration(
                                                   borderRadius: BorderRadius
@@ -435,28 +398,28 @@ class _MesInvitationsState extends State<MesInvitations> {
                                                       .center,
                                                   children: [
                                                     (invitations[index]
-                                                        .acceptation) ? Icon(
+                                                        .acceptation) ? const Icon(
                                                       Icons.check_circle,
                                                       size: 40,
                                                       color: Colors.green,
 
                                                     ) :
-                                                    Icon(
+                                                    const Icon(
                                                       Icons.cancel,
                                                       size: 40,
                                                       color: Colors.red,
 
                                                     ),
                                                     (invitations[index]
-                                                        .acceptation) ? Text(
-                                                      "L\'invitation a été acceptée",
+                                                        .acceptation) ? const Text(
+                                                      "L'invitation a été acceptée",
                                                       style: TextStyle(
                                                         fontSize: 16,
                                                         color: Colors.green,
                                                       ),
                                                     ) :
-                                                    Text(
-                                                      "L\'invitation a été refusée",
+                                                    const Text(
+                                                      "L'invitation a été refusée",
                                                       style: TextStyle(
                                                         fontSize: 16,
                                                         color: Colors.red,
@@ -474,7 +437,7 @@ class _MesInvitationsState extends State<MesInvitations> {
                                   );
                                 }else {
                                   _cloudFirestore.supprimerInvitation(auth.currentUser!.uid, index);
-                                  return SizedBox(width: 0,height: 0,);
+                                  return const SizedBox(width: 0,height: 0,);
                                 }
                               }
                             },
@@ -483,7 +446,7 @@ class _MesInvitationsState extends State<MesInvitations> {
                       },
                     );
                   },
-                ) : Center(
+                ) : const Center(
                   child: Text(
                     'Vous n\'avez aucune invitation pour le moment',
                     style: TextStyle(

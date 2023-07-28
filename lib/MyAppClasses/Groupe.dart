@@ -1,34 +1,33 @@
-import 'package:app_test/MyAppClasses/Utilisateur.dart';
 import 'package:places_service/places_service.dart';
 
 class Groupe {
   String _idGroupe = '' ; // parceque Groupe est une subcollection pour Utilisateur
   PlacesAutoCompleteResult _lieuArrivee ;
   DateTime _dateDepart ;
-  Utilisateur _owner ;
-  List<Utilisateur> _membres ;
+  String _idOwner ;
+  String _idGroupeOwner ;
+  List<String> _membres ;
   Groupe({
     required PlacesAutoCompleteResult lieuArrivee,
     required DateTime dateDepart,
-    required Utilisateur owner,
-    List<Utilisateur> membres = const [],
+    required String idOwner,
+    required String idGroupeOwner,
+    List<String> membres = const [],
   })  :
         _lieuArrivee = lieuArrivee,
         _dateDepart = dateDepart,
-        _owner = owner,
+        _idOwner = idOwner,
+        _idGroupeOwner = idGroupeOwner,
         _membres = membres;
-  DateTime get dateDepart => _dateDepart;
-  set dateDepart(DateTime value) {_dateDepart = value;}
-  List<Utilisateur> get membres => _membres;
-  set membres(List<Utilisateur> value) {_membres = value;}
-  Utilisateur get owner => _owner;
-  set owner(Utilisateur value) {_owner = value;}
+
   String get idGroupe => _idGroupe;
-  set idGroupe(String value) {_idGroupe = value;}
-  PlacesAutoCompleteResult get lieuArrivee => _lieuArrivee;
-  set lieuArrivee(PlacesAutoCompleteResult value) {_lieuArrivee = value;}
-  void ajouterUnMembre(Utilisateur utilisateur){
-    _membres.add(utilisateur);
+
+  set idGroupe(String value) {
+    _idGroupe = value;
+  }
+
+  void ajouterUnMembre(String String){
+    _membres.add(String);
   }
   void supprimerUnMembre(int index){
     _membres.remove(index);
@@ -38,8 +37,9 @@ class Groupe {
       'idGroupe': _idGroupe,
       'lieuArrivee': _lieuArrivee != null ? _convertPlaceResultToMap(_lieuArrivee) : null,
       'dateDepart' : _dateDepart,
-      'owner': _owner.toMap(),
-      'membres': _membres.map((membre) => membre.toMap()).toList(),
+      'idOwner': _idOwner,
+      'idGroupeOwner': _idGroupeOwner,
+      'membres': _membres,
     };
   }
   Map<String, dynamic> _convertPlaceResultToMap(PlacesAutoCompleteResult place) {
@@ -57,6 +57,36 @@ class Groupe {
       mainText: '',
       secondaryText: '',
     );
-    return Groupe(lieuArrivee: lieuArrivee, dateDepart: DateTime.now(), owner: Utilisateur.creerUtilisateurVide());
+    return Groupe(lieuArrivee: lieuArrivee, dateDepart: DateTime.now(), idOwner: '',idGroupeOwner: '');
+  }
+
+  PlacesAutoCompleteResult get lieuArrivee => _lieuArrivee;
+
+  set lieuArrivee(PlacesAutoCompleteResult value) {
+    _lieuArrivee = value;
+  }
+
+  DateTime get dateDepart => _dateDepart;
+
+  set dateDepart(DateTime value) {
+    _dateDepart = value;
+  }
+
+  String get idOwner => _idOwner;
+
+  set idOwner(String value) {
+    _idOwner = value;
+  }
+
+  String get idGroupeOwner => _idGroupeOwner;
+
+  set idGroupeOwner(String value) {
+    _idGroupeOwner = value;
+  }
+
+  List<String> get membres => _membres;
+
+  set membres(List<String> value) {
+    _membres = value;
   }
 }

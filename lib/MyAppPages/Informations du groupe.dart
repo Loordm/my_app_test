@@ -11,8 +11,10 @@ import '../MyAppClasses/Utilisateur.dart';
 class InfoGroupe extends StatefulWidget {
   String idGroupe;
   bool estProprietaire;
+  String idGroupeOwner ;
+  String idOwner ;
 
-  InfoGroupe(this.idGroupe, this.estProprietaire);
+  InfoGroupe(this.idGroupe, this.estProprietaire,this.idGroupeOwner,this.idOwner);
 
   @override
   State<InfoGroupe> createState() => _InfoGroupeState();
@@ -147,9 +149,9 @@ class _InfoGroupeState extends State<InfoGroupe> {
               padding: padding,
               child: StreamBuilder<DocumentSnapshot>(
                 stream: utilisateurCollection
-                    .doc(auth.currentUser!.uid)
+                    .doc(widget.idOwner)
                     .collection('Groupes')
-                    .doc(widget.idGroupe)
+                    .doc(widget.idGroupeOwner)
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
@@ -166,27 +168,6 @@ class _InfoGroupeState extends State<InfoGroupe> {
                         secondaryText: snapshot
                             .data!['lieuArrivee']['secondaryText'],
                       );
-                      // get les membres du groupe
-                      List<Map<String, dynamic>> membersData = (snapshot
-                          .data!['membres'] as List<dynamic>).cast<Map<
-                          String,
-                          dynamic>>();
-                      if (membersData.isNotEmpty) {
-                        List<Utilisateur> membres = membersData.map((
-                            memberData) {
-                          return Utilisateur(
-                              identifiant: memberData['identifiant'],
-                              email: memberData['email'],
-                              numeroDeTelephone: memberData['numeroDeTelephone'],
-                              imageUrl: memberData['imageUrl'],
-                              nomComplet: memberData['nomComplet'],
-                              positionActuel: LatLng(0, 0));
-                        }).toList();
-                        listIdUsers.clear();
-                        for (Utilisateur u in membres) {
-                          listIdUsers.add(u.identifiant);
-                        }
-                      }
                       return Column(
                         children: [
                           Row(
@@ -252,7 +233,7 @@ class _InfoGroupeState extends State<InfoGroupe> {
                                 Navigator.push(context, MaterialPageRoute(
                                   builder: (context) =>
                                       ConsulterLesMembres(widget.idGroupe,
-                                          widget.estProprietaire),));
+                                          widget.estProprietaire,widget.idGroupeOwner,widget.idOwner),));
                               },
                               child: Text(
                                 'Consulter les membres du groupe',
@@ -278,7 +259,7 @@ class _InfoGroupeState extends State<InfoGroupe> {
                               onPressed: () {
                                 Navigator.push(context, MaterialPageRoute(
                                   builder: (context) =>
-                                      DeplacementSurLaCarte(widget.idGroupe),));
+                                      DeplacementSurLaCarte(widget.idGroupe,widget.idGroupeOwner,widget.idOwner)));
                               },
                               child: Text(
                                 'Consulter le déplacement sur la carte',

@@ -4,7 +4,6 @@ import 'package:app_test/Services/CloudFirestoreMethodes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:places_service/places_service.dart';
 import '../MyAppClasses/Utilisateur.dart';
 import 'Informations du groupe.dart';
@@ -23,6 +22,7 @@ class _MesGroupesState extends State<MesGroupes> {
       FirebaseFirestore.instance.collection('Utilisateur');
   final FirebaseAuth auth = FirebaseAuth.instance;
   Utilisateur utilisateur = Utilisateur.creerUtilisateurVide();
+  String currentUserIdGroupe = '';
 
   @override
   void initState() {
@@ -55,6 +55,7 @@ class _MesGroupesState extends State<MesGroupes> {
       backgroundColor: Colors.grey[300],
       body: Center(
         child: SafeArea(
+          // le premier pour get le idOwner et le idGroupeOwner pour afficher les informations du groupe du owner
           child: StreamBuilder<QuerySnapshot>(
             stream: utilisateurCollection
                 .doc(auth.currentUser!.uid)
@@ -66,167 +67,189 @@ class _MesGroupesState extends State<MesGroupes> {
               } else {
                 final allGroupes = snapshot.data!.docs;
                 List<Groupe> groupesList = [];
+                currentUserIdGroupe = '';
                 for (var groupe in allGroupes) {
                   if (groupe.exists) {
                     Groupe newGroupe = Groupe.creerGroupeVide();
                     newGroupe.idGroupe = groupe['idGroupe'];
-                    newGroupe.lieuArrivee = PlacesAutoCompleteResult(
-                      placeId: groupe['lieuArrivee']['placeId'],
-                      description: groupe['lieuArrivee']['description'],
-                      mainText: groupe['lieuArrivee']['mainText'],
-                      secondaryText: groupe['lieuArrivee']['secondaryText'],
-                    );
-                    newGroupe.dateDepart = groupe['dateDepart'].toDate();
-                    GeoPoint geoPointArrivee = groupe['owner']['positionActuel'];
-                    newGroupe.owner = Utilisateur(
-                      identifiant: groupe['owner']['identifiant'],
-                      nomComplet: groupe['owner']['nomComplet'],
-                      email: groupe['owner']['email'],
-                      numeroDeTelephone: groupe['owner']['numeroDeTelephone'],
-                      imageUrl: groupe['owner']['imageUrl'],
-                      positionActuel: LatLng(
-                          geoPointArrivee.latitude, geoPointArrivee.longitude),
-                    );
-                    groupesList
-                        .add(
-                        newGroupe); // Add the new Groupe object to the list
+                    currentUserIdGroupe = newGroupe.idGroupe;
+                    newGroupe.idGroupeOwner = groupe['idGroupeOwner'];
+                    if (newGroupe.idGroupeOwner.isEmpty){
+                      newGroupe.idGroupeOwner = newGroupe.idGroupe;
+                    }
+                    newGroupe.idOwner = groupe['idOwner'];
+                    groupesList.add(newGroupe);
                   }
                 }
+                utilisateur.groupes.clear();
                 utilisateur.groupes = groupesList;
                 return (utilisateur.groupes.isNotEmpty)
                     ? ListView.builder(
                         itemCount: utilisateur.groupes.length,
                         itemBuilder: (context, index) {
                           final groupe = utilisateur.groupes[index];
-                          return GestureDetector(
-                            onTap: () {
-                              if (groupe.owner.identifiant ==
-                                  auth.currentUser!.uid) {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            InfoGroupe(groupe.idGroupe, true)));
-                              } else {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => InfoGroupe(
-                                            groupe.idGroupe, false)));
-                              }
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(
-                                    12), // Set the radius here
-                              ),
-                              width: screenWidth,
-                              height: 200,
-                              padding: padding,
-                              margin: const EdgeInsets.all(24),
-                              child: Column(
-                                children: [
-                                  Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          16, 0, 0, 0),
+                          // le 2eme pour get les info du groupe de chaque groupe du owner par les id precedents
+                          return StreamBuilder<DocumentSnapshot>(
+                              stream: utilisateurCollection.doc(groupe.idOwner).collection('Groupes').doc(groupe.idGroupeOwner).snapshots(),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData){
+                                  Groupe groupeOwner = Groupe.creerGroupeVide();
+                                  groupeOwner.idGroupe = snapshot.data!['idGroupe'];
+                                  groupeOwner.idGroupeOwner = snapshot.data!['idGroupeOwner'];
+                                  if (groupeOwner.idGroupeOwner.isEmpty){
+                                    groupeOwner.idGroupeOwner = groupeOwner.idGroupe;
+                                  }
+                                  groupeOwner.lieuArrivee = PlacesAutoCompleteResult(
+                                    placeId: snapshot.data!['lieuArrivee']['placeId'],
+                                    description: snapshot.data!['lieuArrivee']['description'],
+                                    mainText: snapshot.data!['lieuArrivee']['mainText'],
+                                    secondaryText: snapshot.data!['lieuArrivee']['secondaryText'],
+                                  );
+                                  groupeOwner.dateDepart = snapshot.data!['dateDepart'].toDate();
+                                  groupeOwner.idOwner = snapshot.data!['idOwner'];
+                                  Map<String, dynamic> membresData = snapshot.data!.data() as Map<String, dynamic>;
+                                  if (membresData.isNotEmpty){
+                                    groupeOwner.membres = List<String>.from(membresData['membres']);
+                                  }
+                                  if (groupeOwner.membres.contains(auth.currentUser!.uid) || groupeOwner.idOwner == auth.currentUser!.uid) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      if (groupe.idOwner ==
+                                          auth.currentUser!.uid) {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    InfoGroupe(groupe.idGroupe, true,groupe.idGroupeOwner,groupe.idOwner)));
+                                      } else {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => InfoGroupe(
+                                                    groupe.idGroupe, false,groupe.idGroupeOwner,groupe.idOwner)));
+                                      }
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(
+                                            12),
+                                      ),
+                                      width: screenWidth,
+                                      height: 200,
+                                      padding: padding,
+                                      margin: const EdgeInsets.all(24),
                                       child: Column(
                                         children: [
-                                          Text(
-                                            '${groupe.lieuArrivee.description}',
-                                            style: const TextStyle(
-                                                fontSize: textSize,
-                                                fontFamily: 'Poppins',
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold),
+                                          Align(
+                                            alignment: Alignment.topLeft,
+                                            child: Padding(
+                                              padding: const EdgeInsets.fromLTRB(
+                                                  16, 0, 0, 0),
+                                              child: Column(
+                                                children: [
+                                                  Text(
+                                                    '${groupeOwner.lieuArrivee.description}',
+                                                    style: const TextStyle(
+                                                        fontSize: textSize,
+                                                        fontFamily: 'Poppins',
+                                                        color: Colors.black,
+                                                        fontWeight: FontWeight.bold),
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  Text(
+                                                    '${groupeOwner.dateDepart.day}/${groupeOwner.dateDepart.month}/${groupeOwner.dateDepart.year}',
+                                                    style: const TextStyle(
+                                                        fontSize: textSize,
+                                                        fontFamily: 'Poppins',
+                                                        color: Colors.black,
+                                                        fontWeight: FontWeight.bold),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
                                           ),
                                           const SizedBox(
                                             height: 10,
                                           ),
-                                          Text(
-                                            '${groupe.dateDepart.day}/${groupe.dateDepart.month}/${groupe.dateDepart.year}',
-                                            style: const TextStyle(
-                                                fontSize: textSize,
-                                                fontFamily: 'Poppins',
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold),
-                                          ),
+                                          Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                            children: [
+                                              groupe.idOwner ==
+                                                  auth.currentUser!.uid
+                                                  ? const Text(
+                                                'Vous êtes le propriétaire',
+                                                style: TextStyle(
+                                                    fontSize: textSize,
+                                                    fontFamily: 'Poppins',
+                                                    color: Colors.black),
+                                              )
+                                                  : const Text(
+                                                'Vous êtes un membre',
+                                                style: TextStyle(
+                                                    fontSize: textSize,
+                                                    fontFamily: 'Poppins',
+                                                    color: Colors.black),
+                                              ),
+                                              const SizedBox(
+                                                height: 10,
+                                              ),
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.red,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                    BorderRadius.circular(24),
+                                                  ),
+                                                ),
+                                                onPressed: () async {
+                                                  await CloudFirestoreMethodes()
+                                                      .supprimerGroupe(
+                                                      auth.currentUser!.uid,
+                                                      groupe.idGroupe);
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    const SnackBar(
+                                                        duration: Duration(seconds: 2),
+                                                        content: Text(
+                                                            'Supprition du groupe avec succees')),
+                                                  );
+                                                },
+                                                child: groupe.idOwner ==
+                                                    auth.currentUser!.uid
+                                                    ? const Text(
+                                                  'Supprimer ce groupe',
+                                                  style: TextStyle(
+                                                      fontFamily: 'Poppins',
+                                                      fontSize: 14,
+                                                      color: Colors.white),
+                                                )
+                                                    : const Text(
+                                                  'Quitter ce groupe',
+                                                  style: TextStyle(
+                                                      fontFamily: 'Poppins',
+                                                      fontSize: 14,
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                            ],
+                                          )
                                         ],
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      groupe.owner.identifiant ==
-                                              auth.currentUser!.uid
-                                          ? const Text(
-                                              'Vous êtes le propriétaire',
-                                              style: TextStyle(
-                                                  fontSize: textSize,
-                                                  fontFamily: 'Poppins',
-                                                  color: Colors.black),
-                                            )
-                                          : const Text(
-                                              'Vous êtes un membre',
-                                              style: TextStyle(
-                                                  fontSize: textSize,
-                                                  fontFamily: 'Poppins',
-                                                  color: Colors.black),
-                                            ),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.red,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(24),
-                                          ),
-                                        ),
-                                        onPressed: () async {
-                                          await CloudFirestoreMethodes()
-                                              .supprimerGroupe(
-                                                  auth.currentUser!.uid,
-                                                  groupe.idGroupe);
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                                duration: Duration(seconds: 2),
-                                                content: Text(
-                                                    'Supprition du groupe avec succees')),
-                                          );
-                                        },
-                                        child: groupe.owner.identifiant ==
-                                                auth.currentUser!.uid
-                                            ? const Text(
-                                                'Supprimer ce groupe',
-                                                style: TextStyle(
-                                                    fontFamily: 'Poppins',
-                                                    fontSize: 14,
-                                                    color: Colors.white),
-                                              )
-                                            : const Text(
-                                                'Quitter ce groupe',
-                                                style: TextStyle(
-                                                    fontFamily: 'Poppins',
-                                                    fontSize: 14,
-                                                    color: Colors.white),
-                                              ),
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
+                                  );
+                                  }else {
+                                    CloudFirestoreMethodes().supprimerGroupe(auth.currentUser!.uid, currentUserIdGroupe);
+                                    return const SizedBox(height: 0,width: 0,);
+                                  }
+                                }else {
+                                  return const SizedBox(height: 0,width: 0,);
+                                }
+                              },
                           );
                         },
                       )

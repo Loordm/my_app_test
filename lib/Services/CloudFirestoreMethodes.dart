@@ -78,7 +78,7 @@ class CloudFirestoreMethodes {
     });
   }
 
-  Future<void> ajouterGroupe(String uid, Groupe groupe) async {
+  Future<void> ajouterGroupe(String uid, Groupe groupe, String idGroupeOwner) async {
     Map<String, dynamic> groupeData = groupe.toMap();
     DocumentReference docRef = await _utilisateurCollection
         .doc(uid)
@@ -86,6 +86,11 @@ class CloudFirestoreMethodes {
         .add(groupeData);
     // sauvegarder le groupe id
     groupe.idGroupe = docRef.id;
+    if (groupe.idGroupe != idGroupeOwner) {
+      groupe.idGroupeOwner = idGroupeOwner;
+    } else {
+      groupe.idGroupeOwner = docRef.id;
+    }
     groupeData = groupe.toMap();
     await _utilisateurCollection
         .doc(uid)
@@ -93,11 +98,10 @@ class CloudFirestoreMethodes {
         .doc(docRef.id)
         .set(groupeData);
   }
-  Future<void> ajouterUtilisateurAuGroupe(String uidUtilisateur, String uidGroupe, Utilisateur utilisateur) async{
+  Future<void> ajouterUtilisateurAuGroupe(String uidUtilisateur, String uidGroupe, String idmembreAajouter) async{
     DocumentReference groupeDocRef = _utilisateurCollection.doc(uidUtilisateur).collection('Groupes').doc(uidGroupe);
-    Map<String, dynamic> userMap = utilisateur.toMap();
     await groupeDocRef.update({
-      'membres': FieldValue.arrayUnion([userMap]),
+      'membres': FieldValue.arrayUnion([idmembreAajouter]),
     });
   }
   Future<void>supprimerGroupe(String uid, String idGroupe) async{
@@ -108,7 +112,9 @@ class CloudFirestoreMethodes {
     DocumentReference groupeDocRef = _utilisateurCollection.doc(uidUser).collection('Groupes').doc(uidGroupe);
     await groupeDocRef.get().then((snapshot) {
       if (snapshot.exists) {
-        List<Map<String, dynamic>> listMembres = List<Map<String, dynamic>>.from((snapshot.data() as Map<String, dynamic>)['membres']);
+        Map<String, dynamic> membresData =
+        snapshot.data() as Map<String, dynamic>;
+        var listMembres = List<String>.from(membresData['membres']);
         if (index >= 0 && index < listMembres.length) {
           listMembres.removeAt(index);
           groupeDocRef.update({'membres': listMembres});

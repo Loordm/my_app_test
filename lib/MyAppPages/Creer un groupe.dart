@@ -1,6 +1,5 @@
 import 'package:app_test/MyAppClasses/Groupe.dart';
 import 'package:app_test/MyAppClasses/Invitation.dart';
-import 'package:app_test/MyAppClasses/Utilisateur.dart';
 import 'package:app_test/MyAppPages/Dialog%20Inviter%20un%20membre.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -62,7 +61,7 @@ class _CreerGroupeState extends State<CreerGroupe> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          title: Align(
+          title: const Align(
             alignment: Alignment.center,
             child: Text(
               'Créer un groupe',
@@ -102,10 +101,10 @@ class _CreerGroupeState extends State<CreerGroupe> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
-                Text(
+                const Text(
                   'Donnez le lieu d\'arrivée',
                   style: TextStyle(
                       fontSize: 16,
@@ -124,21 +123,22 @@ class _CreerGroupeState extends State<CreerGroupe> {
                         return ChoixLieuArrivee();
                       },
                     );
-                    if (lieuArrivee != null)
+                    if (lieuArrivee != null) {
                       _lieuArriveeController.text = lieuArrivee!.description!;
-                    else
+                    } else {
                       _lieuArriveeController.text = '';
+                    }
                   },
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                       hintText: 'Lieu d\'arrivée',
                       hintStyle: TextStyle(
                         fontFamily: 'Poppins',
                       )),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
-                Text(
+                const Text(
                   'Donnez la date de départ',
                   style: TextStyle(
                       fontSize: 16,
@@ -146,7 +146,7 @@ class _CreerGroupeState extends State<CreerGroupe> {
                       fontFamily: 'Poppins',
                       color: Colors.black),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 Row(
@@ -155,7 +155,7 @@ class _CreerGroupeState extends State<CreerGroupe> {
                   children: [
                     IconButton(
                       onPressed: _selectDate,
-                      icon: Icon(Icons.calendar_today),
+                      icon: const Icon(Icons.calendar_today),
                     ),
                     GestureDetector(
                       onTap: _selectDate,
@@ -170,8 +170,8 @@ class _CreerGroupeState extends State<CreerGroupe> {
                             ? Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Text(
-                                  '${_selectedDate!.toString().split(" ")[0]}',
-                                  style: TextStyle(
+                                  _selectedDate!.toString().split(" ")[0],
+                                  style: const TextStyle(
                                       fontFamily: 'Poppins',
                                       fontSize: 16,
                                       fontWeight: FontWeight.w100,
@@ -182,7 +182,7 @@ class _CreerGroupeState extends State<CreerGroupe> {
                                 padding: const EdgeInsets.all(8.0),
                                 child: Text(
                                   '${DateTime.now().day}-${DateTime.now().month}-${DateTime.now().year}',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontFamily: 'Poppins',
                                       fontSize: 16,
                                       fontWeight: FontWeight.w100,
@@ -193,12 +193,12 @@ class _CreerGroupeState extends State<CreerGroupe> {
                     ),
                   ],
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Row(
                   children: [
-                    Text(
+                    const Text(
                       'Inviter des membres',
                       style: TextStyle(
                           fontSize: 16,
@@ -206,7 +206,7 @@ class _CreerGroupeState extends State<CreerGroupe> {
                           fontFamily: 'Poppins',
                           color: Colors.black),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 20,
                     ),
                     IconButton(
@@ -215,13 +215,13 @@ class _CreerGroupeState extends State<CreerGroupe> {
                             context: context,
                             barrierDismissible: false,
                             builder: (context) {
-                              return InviterUnMembre();
+                              return const InviterUnMembre();
                             },
                           );
                           if (emailValue != null && emailValue.isNotEmpty) {
                             setState(() {
                               emailListWidget.add(EmailWidget(emailValue));
-                              emailListWidget.add(SizedBox(
+                              emailListWidget.add(const SizedBox(
                                 height: 20,
                               ));
                               emailListString.add(emailValue);
@@ -236,7 +236,7 @@ class _CreerGroupeState extends State<CreerGroupe> {
                         ))
                   ],
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Column(
@@ -249,7 +249,7 @@ class _CreerGroupeState extends State<CreerGroupe> {
             ),
           ),
         )),
-        floatingActionButton: Container(
+        floatingActionButton: SizedBox(
           width: screenWidth / 2,
           height: 56,
           child: ElevatedButton(
@@ -257,14 +257,14 @@ class _CreerGroupeState extends State<CreerGroupe> {
               setState(() {
                 isLoading = true;
               });
-              Utilisateur utilisateur = Utilisateur.creerUtilisateurVide();
-              utilisateur.identifiant = FirebaseAuth.instance.currentUser!.uid;
               Groupe groupe = Groupe(
                   lieuArrivee: lieuArrivee!,
                   dateDepart: dateDepart,
-                  owner: utilisateur);
+                  idOwner: auth.currentUser!.uid,
+                  idGroupeOwner: ''
+              );
               await _cloudFirestore.ajouterGroupe(
-                  FirebaseAuth.instance.currentUser!.uid, groupe);
+                  FirebaseAuth.instance.currentUser!.uid, groupe,'');
               // envoier les invitations
               for (String emailValue in emailListString) {
                 if (emailValue.isNotEmpty) {
@@ -296,19 +296,8 @@ class _CreerGroupeState extends State<CreerGroupe> {
               });
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Création du groupe avec succée')));
+                  const SnackBar(content: Text('Création du groupe avec succée')));
             },
-            child: (!isLoading)
-                ? Text(
-                    'Créer',
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 18,
-                    ),
-                  )
-                : CircularProgressIndicator(
-                    color: Colors.white,
-                  ),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.indigoAccent[400],
               shape: RoundedRectangleBorder(
@@ -316,6 +305,17 @@ class _CreerGroupeState extends State<CreerGroupe> {
                     BorderRadius.circular(24), // Border radius of the button
               ),
             ),
+            child: (!isLoading)
+                ? const Text(
+                    'Créer',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 18,
+                    ),
+                  )
+                : const CircularProgressIndicator(
+                    color: Colors.white,
+                  ),
           ),
         ));
   }
@@ -334,11 +334,11 @@ class _CreerGroupeState extends State<CreerGroupe> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '$email',
-              style: TextStyle(
+              email,
+              style: const TextStyle(
                   fontFamily: 'Poppins', fontSize: 16, color: Colors.black),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             IconButton(
@@ -355,7 +355,7 @@ class _CreerGroupeState extends State<CreerGroupe> {
                     emailListString.removeAt(index);
                   });
                 },
-                icon: Icon(
+                icon: const Icon(
                   Icons.cancel_outlined,
                   color: Colors.red,
                   size: 30,
