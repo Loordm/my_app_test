@@ -68,10 +68,13 @@ class _InscriptionState extends State<Inscription> {
                           BorderRadius.all(Radius.circular(12)),
                         ),
                         labelText: 'Nom complet',
+                        labelStyle: TextStyle(
+                          fontSize: screenWidth/28
+                        ),
                         hintText:
                         'Entrez votre nom complet',
                         hintStyle: TextStyle(
-                            color: Colors.grey[700], fontSize: 14),
+                            color: Colors.grey[700], fontSize: screenWidth/28),
                         fillColor: Colors.grey.shade100,
                         filled: true,
                       ),
@@ -92,10 +95,13 @@ class _InscriptionState extends State<Inscription> {
                           BorderRadius.all(Radius.circular(12)),
                         ),
                         labelText: 'Numéro de téléphone',
+                        labelStyle: TextStyle(
+                            fontSize: screenWidth/28
+                        ),
                         hintText:
                         'Entrez votre numéro de téléphone',
                         hintStyle: TextStyle(
-                            color: Colors.grey[700], fontSize: 14),
+                            color: Colors.grey[700], fontSize: screenWidth/28),
                         fillColor: Colors.grey.shade100,
                         filled: true,
                       ),
@@ -116,10 +122,13 @@ class _InscriptionState extends State<Inscription> {
                           BorderRadius.all(Radius.circular(12)),
                         ),
                         labelText: 'Email',
+                        labelStyle: TextStyle(
+                            fontSize: screenWidth/28
+                        ),
                         hintText:
                         'Entrez votre email',
                         hintStyle: TextStyle(
-                            color: Colors.grey[700], fontSize: 14),
+                            color: Colors.grey[700], fontSize: screenWidth/28),
                         fillColor: Colors.grey.shade100,
                         filled: true,
                       ),
@@ -155,16 +164,19 @@ class _InscriptionState extends State<Inscription> {
                           BorderRadius.all(Radius.circular(12)),
                         ),
                         labelText: 'Mot de passe',
+                        labelStyle: TextStyle(
+                            fontSize: screenWidth/28
+                        ),
                         hintText:
                         'Entrez votre mot de passe',
                         hintStyle: TextStyle(
-                            color: Colors.grey[700], fontSize: 14),
+                            color: Colors.grey[700], fontSize: screenWidth/28),
                         fillColor: Colors.grey.shade100,
                         filled: true,
                       ),
                     ),
                     SizedBox(height: screenHeight*0.04),
-                    Container(
+                    SizedBox(
                       width: screenWidth,
                       height: 56,
                       child: ElevatedButton(
@@ -212,11 +224,11 @@ class _InscriptionState extends State<Inscription> {
                             borderRadius: BorderRadius.circular(24), // Border radius of the button
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           'S\'inscrire',
                           style: TextStyle(
                             fontFamily: 'Poppins',
-                            fontSize: 18,
+                            fontSize: screenWidth/20,
                           ),
                         ),
                       ),
@@ -224,7 +236,6 @@ class _InscriptionState extends State<Inscription> {
                   ],
                 ),
               ),
-              SizedBox(height: screenHeight*0.04),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: TextButton(

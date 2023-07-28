@@ -1,10 +1,8 @@
 import 'package:app_test/MyAppPages/Acceuil.dart';
 import 'package:app_test/MyAppPages/Inscription.dart';
 import 'package:flutter/material.dart';
-
 import '../Services/auth.dart';
 import 'Loading.dart';
-import 'MesGroupes.dart';
 class Connexion extends StatefulWidget {
   static const String screenRoute = '/connexion' ;
   Connexion({Key? key}) : super(key: key);
@@ -15,8 +13,8 @@ class Connexion extends StatefulWidget {
 class _ConnexionState extends State<Connexion> {
   bool _isObscured = false ;
   final AuthService _auth = AuthService();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _motDePasseController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _motDePasseController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
@@ -36,7 +34,7 @@ class _ConnexionState extends State<Connexion> {
                 height: screenHeight*0.2,
               ),
             ),
-            Text(
+            const Text(
                 'Connexion',
                 style: TextStyle(
                   fontSize: 30,
@@ -44,14 +42,14 @@ class _ConnexionState extends State<Connexion> {
                   fontWeight: FontWeight.bold
                 ),
             ),
-            SizedBox(height: screenHeight*0.1,),
+            SizedBox(height: screenHeight/8,),
             Padding(
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 children: [
                   TextFormField(
                     controller: _emailController,
-                    style: TextStyle(fontFamily: 'Poppins'),
+                    style: const TextStyle(fontFamily: 'Poppins'),
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       prefixIcon: const Icon(
@@ -59,15 +57,18 @@ class _ConnexionState extends State<Connexion> {
                         color: Colors.black,
                         size: 20,
                       ),
-                      border: OutlineInputBorder(
+                      border: const OutlineInputBorder(
                         borderRadius:
                         BorderRadius.all(Radius.circular(12)),
                       ),
                       labelText: 'Email',
+                      labelStyle: TextStyle(
+                        fontSize: screenWidth/28
+                      ),
                       hintText:
                       'Entrez votre email',
                       hintStyle: TextStyle(
-                          color: Colors.grey[700], fontSize: 14),
+                          color: Colors.grey[700], fontSize: screenWidth/28),
                       fillColor: Colors.grey.shade100,
                       filled: true,
                     ),
@@ -75,7 +76,7 @@ class _ConnexionState extends State<Connexion> {
                   SizedBox(height: screenHeight*0.04),
                   TextFormField(
                     controller: _motDePasseController,
-                    style: TextStyle(fontFamily: 'Poppins'),
+                    style: const TextStyle(fontFamily: 'Poppins'),
                     keyboardType: TextInputType.visiblePassword,
                     obscureText: !_isObscured,
                     decoration: InputDecoration(
@@ -98,21 +99,24 @@ class _ConnexionState extends State<Connexion> {
                           });
                         },
                       ),
-                      border: OutlineInputBorder(
+                      border: const OutlineInputBorder(
                         borderRadius:
                         BorderRadius.all(Radius.circular(12)),
                       ),
                       labelText: 'Mot de passe',
+                      labelStyle: TextStyle(
+                        fontSize: screenWidth/28
+                      ),
                       hintText:
                       'Entrez votre mot de passe',
                       hintStyle: TextStyle(
-                          color: Colors.grey[700], fontSize: 14),
+                          color: Colors.grey[700], fontSize: screenWidth/28),
                       fillColor: Colors.grey.shade100,
                       filled: true,
                     ),
                   ),
                   SizedBox(height: screenHeight*0.04),
-                  Container(
+                  SizedBox(
                     width: screenWidth,
                     height: 56,
                     child: ElevatedButton(
@@ -143,22 +147,22 @@ class _ConnexionState extends State<Connexion> {
                             );
                           }
                         },
-                        child: Text(
-                          'Connecter',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 18,
-                          ),
-                        ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.indigoAccent[400],
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24), // Border radius of the button
                         ),
                       ),
+                        child: Text(
+                          'Connecter',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: screenWidth/20,
+                          ),
+                        ),
                     ),
                   ),
-                  SizedBox(height: screenHeight*0.04),
+                  SizedBox(height: screenHeight/30),
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: TextButton(
@@ -168,7 +172,7 @@ class _ConnexionState extends State<Connexion> {
                           text: 'Vous n\'avez encore un compte? ',
                           style: TextStyle(
                             fontWeight: FontWeight.normal,
-                            fontSize: 13.0,
+                            fontSize: screenWidth/30,
                             fontFamily: 'Poppins',
                             color: Colors.black,
                           ),
@@ -177,7 +181,7 @@ class _ConnexionState extends State<Connexion> {
                               text: 'Inscrivez-Vous',
                               style: TextStyle(
                                 fontWeight: FontWeight.normal,
-                                fontSize: 13.0,
+                                fontSize: screenWidth/30,
                                 fontFamily: 'Poppins',
                                 color: Colors.blue,
                                 decoration: TextDecoration.underline,

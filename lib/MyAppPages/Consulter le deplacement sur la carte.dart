@@ -130,7 +130,7 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
     if (mounted) {
       setState(() {
         markers.add(Marker(
-          markerId: MarkerId('Lieu arrivee'),
+          markerId: const MarkerId('Lieu arrivee'),
           position: position,
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
           infoWindow: InfoWindow(
@@ -296,7 +296,6 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
           child: Text(
             'Déplacement sur la carte',
             style: TextStyle(
-                fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
                 fontFamily: 'Poppins'),
@@ -383,6 +382,11 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
                         }).toList();
                         for (Utilisateur u in membres) {
                           listIdUsers.add(u.identifiant);
+                          print(
+                              '*********************************************');
+                          print('id membre : ${u.identifiant}');
+                          print(
+                              '*********************************************');
                         }
                       }
                       listIdUsers.add(idOwner); // to find it in the condition
@@ -460,7 +464,7 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
                         },
                       );
                     } else
-                      return SizedBox(width: 0, height: 0);
+                      return const SizedBox(width: 0, height: 0);
                   }
                 },
               ),
@@ -506,9 +510,11 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
               }
 
               /// 2) set makers to the membres
-              if (!(listIdUsers.contains(auth.currentUser!.uid))) {
-                // vous avez deja la marke
-                for (Utilisateur utilisateur in resteUsers) {
+              print('*********************');
+              print('im here=====');
+              print('*********************');
+              for (Utilisateur utilisateur in resteUsers) {
+                if (utilisateur.identifiant != auth.currentUser!.uid) {
                   String placeActuel = '';
                   LatLng latLngPositionActuel = LatLng(
                       utilisateur.positionActuel.latitude,
@@ -525,20 +531,20 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
                   placeActuel = (lieuActuel.description != null)
                       ? lieuActuel.description!
                       : '';
-                  addMarker(owner.imageUrl, owner.positionActuel,
-                      owner.nomComplet, placeActuel);
+                  addMarker(utilisateur.imageUrl, utilisateur.positionActuel,
+                      utilisateur.nomComplet, placeActuel);
                 }
               }
 
               /// 3) set the marker to the lieuArrivee
               /// get LatLng from PlacesAutoCompleteResult
               LatLng latlngArrivee = await getPlaceLatLng(lieuArrivee.placeId!);
-              /*addMarkerFromAsset(
-                  latlngArrivee, 'Lieu d\'arrivée', lieuArrivee.description!);*/
+              addMarkerFromAsset(
+                  latlngArrivee, 'Lieu d\'arrivée', lieuArrivee.description!);
               polylinePoints = PolylinePoints();
-              /*setPolylines(
+              setPolylines(
                   LatLng(currentPosition!.latitude, currentPosition!.longitude),
-                  latlngArrivee);*/
+                  latlngArrivee);
               setState(() {
                 _isLoading = false;
                 _boutonvisible = false;
