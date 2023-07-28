@@ -33,8 +33,8 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
   final FirebaseAuth auth = FirebaseAuth.instance;
   final _cloudFirestore = CloudFirestoreMethodes();
   Groupe groupe = Groupe.creerGroupeVide();
-  @override
 
+  @override
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
@@ -92,15 +92,13 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                                   actions: [
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.of(context)
-                                            .pop();
+                                        Navigator.of(context).pop();
                                       },
                                       child: Text('Supprimer'),
                                     ),
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.of(context)
-                                            .pop();
+                                        Navigator.of(context).pop();
                                       },
                                       child: Text('Annuler'),
                                     ),
@@ -118,15 +116,13 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                                   actions: [
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.of(context)
-                                            .pop();
+                                        Navigator.of(context).pop();
                                       },
                                       child: Text('Inviter'),
                                     ),
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.of(context)
-                                            .pop();
+                                        Navigator.of(context).pop();
                                       },
                                       child: Text('Annuler'),
                                     ),
@@ -154,9 +150,8 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                                 title: Text('Quitter le groupe'),
                                 actions: [
                                   TextButton(
-                                    onPressed: () async{
-                                      Navigator.of(context)
-                                          .pop();
+                                    onPressed: () async {
+                                      Navigator.of(context).pop();
                                     },
                                     child: Text('Quitter'),
                                   ),
@@ -188,50 +183,92 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
             if (!snapshot.hasData) {
               return Text('Il n\'existe aucun membre');
             } else {
-              // get les informations du goupe
-              DateTime dateDepart = snapshot.data!['dateDepart'].toDate();
-              PlacesAutoCompleteResult lieuArrivee = PlacesAutoCompleteResult(
-                  placeId: snapshot.data!['lieuArrivee']['placeId'],
-                  description: snapshot.data!['lieuArrivee']['description'],
-                  mainText: snapshot.data!['lieuArrivee']['mainText'],
-                  secondaryText: snapshot.data!['lieuArrivee']
-                      ['secondaryText']);
-              groupe.idGroupe = widget.idGroupe;
-              groupe.dateDepart = dateDepart;
-              groupe.lieuArrivee = lieuArrivee;
-              // get le proprietaire du groupe
-              groupe.owner.identifiant = snapshot.data!['owner']['identifiant'];
-              groupe.owner.email = snapshot.data!['owner']['email'];
-              groupe.owner.numeroDeTelephone =
-                  snapshot.data!['owner']['numeroDeTelephone'];
-              groupe.owner.nomComplet = snapshot.data!['owner']['nomComplet'];
-              groupe.owner.imageUrl = snapshot.data!['owner']['imageUrl'];
-              // get les membres du groupe
-              List<Map<String, dynamic>> membersData = (snapshot.data!['membres'] as List<dynamic>).cast<Map<String, dynamic>>();
-              if (membersData.isNotEmpty) {
-                List<Utilisateur> membres = membersData.map((memberData) {
-                  return Utilisateur(
-                      identifiant: memberData['identifiant'],
-                      email: memberData['email'],
-                      numeroDeTelephone: memberData['numeroDeTelephone'],
-                      imageUrl: memberData['imageUrl'],
-                      nomComplet: memberData['nomComplet'],
-                      positionActuel: LatLng(0, 0));
-                }).toList();
-                groupe.membres = membres;
-              }
-              return Column(
-                children: [
-                  SizedBox(height: 20),
-                  (!widget.estProprietaire)
-                      ? Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(24, 8, 4, 0),
+              if (snapshot.data!.exists) {
+                // get les informations du goupe
+                DateTime dateDepart = snapshot.data!['dateDepart'].toDate();
+                PlacesAutoCompleteResult lieuArrivee = PlacesAutoCompleteResult(
+                    placeId: snapshot.data!['lieuArrivee']['placeId'],
+                    description: snapshot.data!['lieuArrivee']['description'],
+                    mainText: snapshot.data!['lieuArrivee']['mainText'],
+                    secondaryText: snapshot.data!['lieuArrivee']
+                        ['secondaryText']);
+                groupe.idGroupe = widget.idGroupe;
+                groupe.dateDepart = dateDepart;
+                groupe.lieuArrivee = lieuArrivee;
+                // get le proprietaire du groupe
+                groupe.owner.identifiant =
+                    snapshot.data!['owner']['identifiant'];
+                groupe.owner.email = snapshot.data!['owner']['email'];
+                groupe.owner.numeroDeTelephone =
+                    snapshot.data!['owner']['numeroDeTelephone'];
+                groupe.owner.nomComplet = snapshot.data!['owner']['nomComplet'];
+                groupe.owner.imageUrl = snapshot.data!['owner']['imageUrl'];
+                // get les membres du groupe
+                List<Map<String, dynamic>> membersData =
+                    (snapshot.data!['membres'] as List<dynamic>)
+                        .cast<Map<String, dynamic>>();
+                if (membersData.isNotEmpty) {
+                  List<Utilisateur> membres = membersData.map((memberData) {
+                    return Utilisateur(
+                        identifiant: memberData['identifiant'],
+                        email: memberData['email'],
+                        numeroDeTelephone: memberData['numeroDeTelephone'],
+                        imageUrl: memberData['imageUrl'],
+                        nomComplet: memberData['nomComplet'],
+                        positionActuel: LatLng(0, 0));
+                  }).toList();
+                  groupe.membres = membres;
+                }
+                return Column(
+                  children: [
+                    SizedBox(height: 20),
+                    (!widget.estProprietaire)
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(24, 8, 4, 0),
+                                child: Text(
+                                  'Le propriétaire',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'Poppins',
+                                      color: Colors.black),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              InfoUserContainer(
+                                  groupe.owner.imageUrl,
+                                  groupe.owner.nomComplet,
+                                  groupe.owner.email,
+                                  groupe.owner.numeroDeTelephone,
+                                  false,
+                                  0,
+                                  ''),
+                            ],
+                          )
+                        : Text(
+                            textAlign: TextAlign.center,
+                            'Vous êtes le propriétaire',
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontFamily: 'Poppins',
+                                color: Colors.black),
+                          ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    (groupe.membres.isNotEmpty)
+                        ? Padding(
+                            padding: const EdgeInsets.fromLTRB(24, 8, 4, 0),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
                               child: Text(
-                                'Le propriétaire',
+                                'Les membres',
                                 style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -239,66 +276,37 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                                     color: Colors.black),
                               ),
                             ),
-                            SizedBox(height: 10,),
-                            InfoUserContainer(
-                                groupe.owner.imageUrl,
-                                groupe.owner.nomComplet,
-                                groupe.owner.email,
-                                groupe.owner.numeroDeTelephone,
-                                false,0,''),
-                          ],
-                        )
-                      : Text(
-                          textAlign: TextAlign.center,
-                          'Vous êtes le propriétaire',
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'Poppins',
-                              color: Colors.black),
-                        ),
-                  SizedBox(height: 10,),
-                  (groupe.membres.isNotEmpty) ? Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 8, 4, 0),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Les membres',
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Poppins',
-                            color: Colors.black),
-                      ),
-                    ),
-                  ) : Center(child: Text(
-                          'Aucun membre pour le moment',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'Poppins',
-                            color: Colors.black
+                          )
+                        : Center(
+                            child: Text(
+                              'Aucun membre pour le moment',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'Poppins',
+                                  color: Colors.black),
+                            ),
                           ),
-                        ),
-                  ),
-                  SizedBox(height: 10,),
-                  Expanded(
-                    child: ListView.builder(
-                        itemCount: groupe.membres.length,
-                        itemBuilder: (context, index) {
-                          final membreAffiche = groupe.membres[index];
-                          return InfoUserContainer(
-                            membreAffiche.imageUrl,
-                            membreAffiche.nomComplet,
-                            membreAffiche.email,
-                            membreAffiche.numeroDeTelephone,
-                            true,
-                            index,
-                            groupe.idGroupe
-                          );
-                        }
+                    SizedBox(
+                      height: 10,
                     ),
-                  ),
-                ],
-              );
+                    Expanded(
+                      child: ListView.builder(
+                          itemCount: groupe.membres.length,
+                          itemBuilder: (context, index) {
+                            final membreAffiche = groupe.membres[index];
+                            return InfoUserContainer(
+                                membreAffiche.imageUrl,
+                                membreAffiche.nomComplet,
+                                membreAffiche.email,
+                                membreAffiche.numeroDeTelephone,
+                                true,
+                                index,
+                                groupe.idGroupe);
+                          }),
+                    ),
+                  ],
+                );
+              }else return SizedBox(width: 0,height: 0,);
             }
           },
         ),
@@ -306,8 +314,14 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
     );
   }
 
-  Widget InfoUserContainer(String imageUrl, String nomComplet, String email,
-      String numeroDeTelephone, bool ableToDelete, int index,String uidGroupe) {
+  Widget InfoUserContainer(
+      String imageUrl,
+      String nomComplet,
+      String email,
+      String numeroDeTelephone,
+      bool ableToDelete,
+      int index,
+      String uidGroupe) {
     final Size screenSize = MediaQuery.of(context).size;
     final double screenWidth = screenSize.width;
     final double screenHeight = screenSize.height;
@@ -319,7 +333,7 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
       ),
       width: screenWidth,
       padding: EdgeInsets.fromLTRB(4, 8, 4, 0),
-      margin: EdgeInsets.symmetric(horizontal: 24,vertical: 24),
+      margin: EdgeInsets.symmetric(horizontal: 24, vertical: 24),
       height: (ableToDelete && widget.estProprietaire) ? 210 : 180,
       child: Column(
         children: [
@@ -393,8 +407,7 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                     color: Colors.indigoAccent,
                   )),
               onPressed: () {
-                launchUrlString(
-                    "tel:${numeroDeTelephone}");
+                launchUrlString("tel:${numeroDeTelephone}");
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -426,20 +439,23 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                       context: context,
                       builder: (BuildContext context) {
                         return AlertDialog(
-                          title: Text('Voulez vous supprimer cet utilisateur ?'),
+                          title:
+                              Text('Voulez vous supprimer cet utilisateur ?'),
                           actions: [
                             TextButton(
-                              onPressed: () async{
-                                await _cloudFirestore.supprimerUtilisateurAuGroupe(auth.currentUser!.uid,uidGroupe, index);
-                                Navigator.of(context)
-                                    .pop();
+                              onPressed: () async {
+                                await _cloudFirestore
+                                    .supprimerUtilisateurAuGroupe(
+                                        auth.currentUser!.uid,
+                                        uidGroupe,
+                                        index);
+                                Navigator.of(context).pop();
                               },
                               child: Text('Oui'),
                             ),
                             TextButton(
                               onPressed: () {
-                                Navigator.of(context)
-                                    .pop();
+                                Navigator.of(context).pop();
                               },
                               child: Text('Annuler'),
                             ),

@@ -33,7 +33,8 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
   late PolylinePoints polylinePoints;
   final FirebaseAuth auth = FirebaseAuth.instance;
   final CollectionReference utilisateurCollection =
-  FirebaseFirestore.instance.collection('Utilisateur');
+      FirebaseFirestore.instance.collection('Utilisateur');
+
   //******************************
   List<String> listIdUsers = [];
   String idOwner = '';
@@ -42,11 +43,7 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
   bool _boutonvisible = true;
   bool _isLoading = false;
   PlacesAutoCompleteResult lieuArrivee = PlacesAutoCompleteResult(
-      placeId: '',
-      description: '',
-      mainText: '',
-      secondaryText: ''
-  );
+      placeId: '', description: '', mainText: '', secondaryText: '');
 
   /*Future<Uint8List> getBytesFromAsset(String path, int width) async {
     ByteData data = await rootBundle.load(path);
@@ -105,7 +102,8 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
       targetWidth: width,
     );
     ui.FrameInfo fi = await codec.getNextFrame();
-    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
+        .buffer
         .asUint8List();
   }
 
@@ -119,14 +117,16 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
       targetWidth: width,
     );
     ui.FrameInfo fi = await codec.getNextFrame();
-    final Uint8List resizedMarkerIconBytes = (await fi.image.toByteData(
-        format: ui.ImageByteFormat.png))!.buffer.asUint8List();
+    final Uint8List resizedMarkerIconBytes =
+        (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
+            .buffer
+            .asUint8List();
 
     return BitmapDescriptor.fromBytes(resizedMarkerIconBytes);
   }
 
-  Future<void> addMarkerFromAsset(LatLng position,
-      String nomComplet, String placeActuel) async {
+  Future<void> addMarkerFromAsset(
+      LatLng position, String nomComplet, String placeActuel) async {
     if (mounted) {
       setState(() {
         markers.add(Marker(
@@ -142,7 +142,6 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
     }
   }
 
-
   Future<Uint8List> getBytesFromNetwork(String url, int width) async {
     http.Response response = await http.get(Uri.parse(url));
     ui.Codec codec = await ui.instantiateImageCodec(
@@ -150,14 +149,15 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
       targetWidth: width,
     );
     ui.FrameInfo fi = await codec.getNextFrame();
-    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
+        .buffer
         .asUint8List();
   }
 
   Future<void> addMarker(String networkImageUrl, LatLng position,
       String nomComplet, String placeActuel) async {
-    final Uint8List markerIconBytes = await getBytesFromNetwork(
-        networkImageUrl, 100);
+    final Uint8List markerIconBytes =
+        await getBytesFromNetwork(networkImageUrl, 100);
     await getBytesFromNetwork(networkImageUrl, 120).then((value) {
       if (mounted) {
         setState(() {
@@ -187,15 +187,16 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
         polylineId: const PolylineId("Route"),
         points: polylineCoordinates,
         color: Colors.black,
-        width: 5,)
-      );
+        width: 5,
+      ));
       _polylineSet.add(Polyline(
         polylineId: const PolylineId("background"),
         points: polylineCoordinates,
         color: Colors.blue,
         width: 3,
       ));
-      markers.add(Marker(  // Add a marker for depart
+      markers.add(Marker(
+        // Add a marker for depart
         markerId: const MarkerId('depart'),
         position: depart,
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
@@ -206,8 +207,8 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
     });
   }
 
-  Future<PlacesAutoCompleteResult> getPlaceFromLatLng(double lat,
-      double lng) async {
+  Future<PlacesAutoCompleteResult> getPlaceFromLatLng(
+      double lat, double lng) async {
     final String url =
         'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=AIzaSyC9sGlH43GL0Jer73n9ETKsxNpZqvrWn-k';
     final http.Response response = await http.get(Uri.parse(url));
@@ -216,9 +217,9 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
       final formattedAddress = decodedJson['results'][0]['formatted_address'];
       final placeId = decodedJson['results'][0]['place_id'];
       final mainText =
-      decodedJson['results'][0]['address_components'][0]['long_name'];
+          decodedJson['results'][0]['address_components'][0]['long_name'];
       final secondaryText =
-      decodedJson['results'][0]['address_components'][1]['long_name'];
+          decodedJson['results'][0]['address_components'][1]['long_name'];
       return PlacesAutoCompleteResult(
           placeId: placeId,
           description: formattedAddress,
@@ -284,9 +285,7 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
 
   @override
   Widget build(BuildContext context) {
-    final Size screenSize = MediaQuery
-        .of(context)
-        .size;
+    final Size screenSize = MediaQuery.of(context).size;
     final double screenWidth = screenSize.width;
     return Scaffold(
       appBar: AppBar(
@@ -325,127 +324,147 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
       ),
       body: currentPosition == null
           ? Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(color: Colors.white,
-                backgroundColor: Colors.indigoAccent[400],
-              ),
-              const Text('Veuillez patienter un instant...')
-            ],
-          ))
+              child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(
+                  color: Colors.white,
+                  backgroundColor: Colors.indigoAccent[400],
+                ),
+                const Text('Veuillez patienter un instant...')
+              ],
+            ))
           : SafeArea(
-        // le premier StreamBuilder pour get les id de chaque utilisateur dans le groupe
-        child: StreamBuilder<DocumentSnapshot>(
-          stream: utilisateurCollection
-              .doc(auth.currentUser!.uid)
-              .collection('Groupes')
-              .doc(widget.idGroupe)
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const Text('Il n\'existe aucun Groupe');
-            } else {
-              listIdUsers.clear();
-              resteUsers.clear();
-              idOwner = '';
-              owner = Utilisateur.creerUtilisateurVide();
-              // get les informations du groupe
-              lieuArrivee = PlacesAutoCompleteResult(
-                  placeId: snapshot.data!['lieuArrivee']['placeId'],
-                  description: snapshot.data!['lieuArrivee']['description'],
-                  mainText: snapshot.data!['lieuArrivee']['mainText'],
-                  secondaryText: snapshot.data!['lieuArrivee']
-                  ['secondaryText']);
-              // get le proprietaire du groupe
-              idOwner = snapshot.data!['owner']['identifiant'];
-              print('************************************');
-              print('idOwner = $idOwner');
-              print('************************************');
-              // get les membres du groupe
-              List<Map<String, dynamic>> membersData = (snapshot
-                  .data!['membres'] as List<dynamic>).cast<
-                  Map<String, dynamic>>();
-              if (membersData.isNotEmpty) {
-                List<Utilisateur> membres = membersData.map((memberData) {
-                  return Utilisateur(
-                      identifiant: memberData['identifiant'],
-                      email: memberData['email'],
-                      numeroDeTelephone: memberData['numeroDeTelephone'],
-                      imageUrl: memberData['imageUrl'],
-                      nomComplet: memberData['nomComplet'],
-                      positionActuel: const LatLng(0, 0));
-                }).toList();
-                for (Utilisateur u in membres) {
-                  listIdUsers.add(u.identifiant);
-                }
-              }
-              listIdUsers.add(idOwner); // to find it in the condition
-              print('************************************');
-              print('listIdUsers = $listIdUsers');
-              print('************************************');
-              // le 2eme StreamBuilder pour get les utilisateurs qui appartient au ce groupe par les id precedentes
-              return StreamBuilder<QuerySnapshot>(
-                stream: utilisateurCollection.snapshots(),
+              // le premier StreamBuilder pour get les id de chaque utilisateur dans le groupe
+              child: StreamBuilder<DocumentSnapshot>(
+                stream: utilisateurCollection
+                    .doc(auth.currentUser!.uid)
+                    .collection('Groupes')
+                    .doc(widget.idGroupe)
+                    .snapshots(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
-                    return const Text('Il n\'existe aucun membre');
+                    return const Text('Il n\'existe aucun Groupe');
                   } else {
-                    final allUsers = snapshot.data!.docs;
-                    for (var u in allUsers) {
-                      if (listIdUsers.contains(u['identifiant'])) {
-                        Utilisateur utilisateur = Utilisateur
-                            .creerUtilisateurVide();
-                        utilisateur.identifiant = u['identifiant'];
-                        utilisateur.nomComplet = u['nomComplet'];
-                        utilisateur.email = u['email'];
-                        utilisateur.numeroDeTelephone = u['numeroDeTelephone'];
-                        utilisateur.imageUrl = u['imageUrl'];
-                        GeoPoint geoPointActuel = u['positionActuel'];
-                        utilisateur.positionActuel = LatLng(geoPointActuel
-                            .latitude, geoPointActuel.longitude);
-                        if (utilisateur.identifiant == idOwner &&
-                            listIdUsers.contains(utilisateur.identifiant)) {
-                          // si ce utilisateur est le owner
-                          // et il faut qu'il fait partie du groupe
-                          owner = utilisateur;
-                          print('************************************');
-                          print('owner info : ${owner.identifiant}, ${owner.email}');
-                          print('************************************');
-                        } else if (utilisateur.identifiant != idOwner &&
-                            listIdUsers.contains(utilisateur.identifiant)) {
-                          // si ce utilisateur est un membre
-                          // et il faut qu'il fait partie du groupe
-                          resteUsers.add(utilisateur);
-                        }
-                        for (Utilisateur s in resteUsers){
-                          print('************************************');
-                          print('membre info : ${s.identifiant}, ${s.email}');
-                          print('************************************');
+                    listIdUsers.clear();
+                    resteUsers.clear();
+                    idOwner = '';
+                    owner = Utilisateur.creerUtilisateurVide();
+                    if (snapshot.data!.exists) {
+                      // get les informations du groupe
+                      lieuArrivee = PlacesAutoCompleteResult(
+                          placeId: snapshot.data!['lieuArrivee']['placeId'],
+                          description: snapshot.data!['lieuArrivee']
+                              ['description'],
+                          mainText: snapshot.data!['lieuArrivee']['mainText'],
+                          secondaryText: snapshot.data!['lieuArrivee']
+                              ['secondaryText']);
+                      // get le proprietaire du groupe
+                      idOwner = snapshot.data!['owner']['identifiant'];
+                      print('************************************');
+                      print('idOwner = $idOwner');
+                      print('************************************');
+                      // get les membres du groupe
+                      List<Map<String, dynamic>> membersData =
+                          (snapshot.data!['membres'] as List<dynamic>)
+                              .cast<Map<String, dynamic>>();
+                      if (membersData.isNotEmpty) {
+                        List<Utilisateur> membres =
+                            membersData.map((memberData) {
+                          return Utilisateur(
+                              identifiant: memberData['identifiant'],
+                              email: memberData['email'],
+                              numeroDeTelephone:
+                                  memberData['numeroDeTelephone'],
+                              imageUrl: memberData['imageUrl'],
+                              nomComplet: memberData['nomComplet'],
+                              positionActuel: const LatLng(0, 0));
+                        }).toList();
+                        for (Utilisateur u in membres) {
+                          listIdUsers.add(u.identifiant);
                         }
                       }
-                    }
-                    return GoogleMap(
-                      initialCameraPosition: CameraPosition(
-                        target: currentPosition!,
-                        zoom: 14.0,
-                      ),
-                      myLocationEnabled: true,
-                      myLocationButtonEnabled: true,
-                      markers: Set.from(markers),
-                      onMapCreated: (GoogleMapController controller) {
-                        mapController = controller;
-                      },
-                      polylines: _polylineSet,
-                    );
+                      listIdUsers.add(idOwner); // to find it in the condition
+                      print('************************************');
+                      print('listIdUsers = $listIdUsers');
+                      print('************************************');
+                      // le 2eme StreamBuilder pour get les utilisateurs qui appartient au ce groupe par les id precedentes
+                      return StreamBuilder<QuerySnapshot>(
+                        stream: utilisateurCollection.snapshots(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const Text('Il n\'existe aucun membre');
+                          } else {
+                            final allUsers = snapshot.data!.docs;
+                            for (var u in allUsers) {
+                              if (listIdUsers.contains(u['identifiant'])) {
+                                if (u.exists) {
+                                  Utilisateur utilisateur =
+                                      Utilisateur.creerUtilisateurVide();
+                                  utilisateur.identifiant = u['identifiant'];
+                                  utilisateur.nomComplet = u['nomComplet'];
+                                  utilisateur.email = u['email'];
+                                  utilisateur.numeroDeTelephone =
+                                      u['numeroDeTelephone'];
+                                  utilisateur.imageUrl = u['imageUrl'];
+                                  GeoPoint geoPointActuel = u['positionActuel'];
+                                  utilisateur.positionActuel = LatLng(
+                                      geoPointActuel.latitude,
+                                      geoPointActuel.longitude);
+                                  if (utilisateur.identifiant == idOwner &&
+                                      listIdUsers
+                                          .contains(utilisateur.identifiant)) {
+                                    // si ce utilisateur est le owner
+                                    // et il faut qu'il fait partie du groupe
+                                    owner = utilisateur;
+                                    print(
+                                        '************************************');
+                                    print(
+                                        'owner info : ${owner.identifiant}, ${owner.email}');
+                                    print(
+                                        '************************************');
+                                  } else if (utilisateur.identifiant !=
+                                          idOwner &&
+                                      listIdUsers
+                                          .contains(utilisateur.identifiant)) {
+                                    // si ce utilisateur est un membre
+                                    // et il faut qu'il fait partie du groupe
+                                    resteUsers.add(utilisateur);
+                                  }
+                                  for (Utilisateur s in resteUsers) {
+                                    print(
+                                        '************************************');
+                                    print(
+                                        'membre info : ${s.identifiant}, ${s.email}');
+                                    print(
+                                        '************************************');
+                                  }
+                                }
+                              }
+                            }
+                            return GoogleMap(
+                              initialCameraPosition: CameraPosition(
+                                target: currentPosition!,
+                                zoom: 14.0,
+                              ),
+                              myLocationEnabled: true,
+                              myLocationButtonEnabled: true,
+                              markers: Set.from(markers),
+                              onMapCreated: (GoogleMapController controller) {
+                                mapController = controller;
+                              },
+                              polylines: _polylineSet,
+                            );
+                          }
+                        },
+                      );
+                    } else
+                      return SizedBox(width: 0, height: 0);
                   }
                 },
-              );
-            }
-          },
-        ),
-      ),
+              ),
+            ),
       floatingActionButton: Visibility(
         visible: _boutonvisible && currentPosition != null,
         child: Align(
@@ -461,7 +480,8 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
               });
 
               /// 1) set a marker to the owner
-              if (idOwner != auth.currentUser!.uid) { // vous avez deja la marke
+              if (idOwner != auth.currentUser!.uid) {
+                // vous avez deja la marke
                 String placeActuelOwner = '';
                 LatLng latLngPositionActuelOwner = LatLng(
                     owner.positionActuel.latitude,
@@ -470,53 +490,55 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
                     placeId: '',
                     description: '',
                     mainText: '',
-                    secondaryText: ''
-                );
+                    secondaryText: '');
                 print('****************************************');
-                print('LatLng Owner : ${latLngPositionActuelOwner.latitude},${latLngPositionActuelOwner.longitude}');
+                print(
+                    'LatLng Owner : ${latLngPositionActuelOwner.latitude},${latLngPositionActuelOwner.longitude}');
                 print('****************************************');
                 lieuActuel = await getPlaceFromLatLng(
                     latLngPositionActuelOwner.latitude,
                     latLngPositionActuelOwner.longitude);
-                placeActuelOwner =
-                (lieuActuel.description != null) ? lieuActuel.description! : '';
+                placeActuelOwner = (lieuActuel.description != null)
+                    ? lieuActuel.description!
+                    : '';
                 addMarker(owner.imageUrl, owner.positionActuel,
                     '${owner.nomComplet} (Le propriétaire)', placeActuelOwner);
               }
 
               /// 2) set makers to the membres
-              if (!(listIdUsers.contains(
-                  auth.currentUser!.uid))) { // vous avez deja la marke
+              if (!(listIdUsers.contains(auth.currentUser!.uid))) {
+                // vous avez deja la marke
                 for (Utilisateur utilisateur in resteUsers) {
                   String placeActuel = '';
                   LatLng latLngPositionActuel = LatLng(
                       utilisateur.positionActuel.latitude,
                       utilisateur.positionActuel.longitude);
-                  PlacesAutoCompleteResult lieuActuel = PlacesAutoCompleteResult(
-                      placeId: '',
-                      description: '',
-                      mainText: '',
-                      secondaryText: ''
-                  );
+                  PlacesAutoCompleteResult lieuActuel =
+                      PlacesAutoCompleteResult(
+                          placeId: '',
+                          description: '',
+                          mainText: '',
+                          secondaryText: '');
                   lieuActuel = await getPlaceFromLatLng(
                       latLngPositionActuel.latitude,
                       latLngPositionActuel.longitude);
                   placeActuel = (lieuActuel.description != null)
                       ? lieuActuel.description!
                       : '';
-                  addMarker(
-                      owner.imageUrl, owner.positionActuel, owner.nomComplet,
-                      placeActuel);
+                  addMarker(owner.imageUrl, owner.positionActuel,
+                      owner.nomComplet, placeActuel);
                 }
               }
 
               /// 3) set the marker to the lieuArrivee
               /// get LatLng from PlacesAutoCompleteResult
               LatLng latlngArrivee = await getPlaceLatLng(lieuArrivee.placeId!);
-              addMarkerFromAsset(latlngArrivee, 'Lieu d\'arrivée',
-                  lieuArrivee.description!);
+              /*addMarkerFromAsset(
+                  latlngArrivee, 'Lieu d\'arrivée', lieuArrivee.description!);*/
               polylinePoints = PolylinePoints();
-              setPolylines(LatLng(currentPosition!.latitude, currentPosition!.longitude), latlngArrivee);
+              /*setPolylines(
+                  LatLng(currentPosition!.latitude, currentPosition!.longitude),
+                  latlngArrivee);*/
               setState(() {
                 _isLoading = false;
                 _boutonvisible = false;
@@ -531,13 +553,15 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
                   padding: const EdgeInsets.all(10.0),
                   child: (!_isLoading)
                       ? const Text(
-                    'Commencer le trajet',
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontFamily: 'Poppins',
-                        color: Colors.white),
-                  )
-                      : const CircularProgressIndicator(color: Colors.white,),
+                          'Commencer le trajet',
+                          style: TextStyle(
+                              fontSize: 14,
+                              fontFamily: 'Poppins',
+                              color: Colors.white),
+                        )
+                      : const CircularProgressIndicator(
+                          color: Colors.white,
+                        ),
                 ),
               ),
             ),

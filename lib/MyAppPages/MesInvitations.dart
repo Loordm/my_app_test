@@ -472,7 +472,10 @@ class _MesInvitationsState extends State<MesInvitations> {
                                       ],
                                     ),
                                   );
-                                }else return SizedBox(width: 0,height: 0,);
+                                }else {
+                                  _cloudFirestore.supprimerInvitation(auth.currentUser!.uid, index);
+                                  return SizedBox(width: 0,height: 0,);
+                                }
                               }
                             },
                           );

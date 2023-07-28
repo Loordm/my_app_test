@@ -67,27 +67,30 @@ class _MesGroupesState extends State<MesGroupes> {
                 final allGroupes = snapshot.data!.docs;
                 List<Groupe> groupesList = [];
                 for (var groupe in allGroupes) {
-                  Groupe newGroupe = Groupe.creerGroupeVide();
-                  newGroupe.idGroupe = groupe['idGroupe'];
-                  newGroupe.lieuArrivee = PlacesAutoCompleteResult(
-                    placeId: groupe['lieuArrivee']['placeId'],
-                    description: groupe['lieuArrivee']['description'],
-                    mainText: groupe['lieuArrivee']['mainText'],
-                    secondaryText: groupe['lieuArrivee']['secondaryText'],
-                  );
-                  newGroupe.dateDepart = groupe['dateDepart'].toDate();
-                  GeoPoint geoPointArrivee = groupe['owner']['positionActuel'];
-                  newGroupe.owner = Utilisateur(
-                    identifiant: groupe['owner']['identifiant'],
-                    nomComplet: groupe['owner']['nomComplet'],
-                    email: groupe['owner']['email'],
-                    numeroDeTelephone: groupe['owner']['numeroDeTelephone'],
-                    imageUrl: groupe['owner']['imageUrl'],
-                    positionActuel: LatLng(
-                        geoPointArrivee.latitude, geoPointArrivee.longitude),
-                  );
-                  groupesList
-                      .add(newGroupe); // Add the new Groupe object to the list
+                  if (groupe.exists) {
+                    Groupe newGroupe = Groupe.creerGroupeVide();
+                    newGroupe.idGroupe = groupe['idGroupe'];
+                    newGroupe.lieuArrivee = PlacesAutoCompleteResult(
+                      placeId: groupe['lieuArrivee']['placeId'],
+                      description: groupe['lieuArrivee']['description'],
+                      mainText: groupe['lieuArrivee']['mainText'],
+                      secondaryText: groupe['lieuArrivee']['secondaryText'],
+                    );
+                    newGroupe.dateDepart = groupe['dateDepart'].toDate();
+                    GeoPoint geoPointArrivee = groupe['owner']['positionActuel'];
+                    newGroupe.owner = Utilisateur(
+                      identifiant: groupe['owner']['identifiant'],
+                      nomComplet: groupe['owner']['nomComplet'],
+                      email: groupe['owner']['email'],
+                      numeroDeTelephone: groupe['owner']['numeroDeTelephone'],
+                      imageUrl: groupe['owner']['imageUrl'],
+                      positionActuel: LatLng(
+                          geoPointArrivee.latitude, geoPointArrivee.longitude),
+                    );
+                    groupesList
+                        .add(
+                        newGroupe); // Add the new Groupe object to the list
+                  }
                 }
                 utilisateur.groupes = groupesList;
                 return (utilisateur.groupes.isNotEmpty)

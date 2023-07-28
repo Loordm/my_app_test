@@ -10,8 +10,9 @@ import '../MyAppClasses/Utilisateur.dart';
 
 class InfoGroupe extends StatefulWidget {
   String idGroupe;
-  bool estProprietaire ;
-  InfoGroupe(this.idGroupe,this.estProprietaire);
+  bool estProprietaire;
+
+  InfoGroupe(this.idGroupe, this.estProprietaire);
 
   @override
   State<InfoGroupe> createState() => _InfoGroupeState();
@@ -21,17 +22,21 @@ enum MenuValues { ModifierDestination, ModifierDateDepart }
 
 class _InfoGroupeState extends State<InfoGroupe> {
   final CollectionReference utilisateurCollection =
-      FirebaseFirestore.instance.collection('Utilisateur');
+  FirebaseFirestore.instance.collection('Utilisateur');
   final FirebaseAuth auth = FirebaseAuth.instance;
   List<String> listIdUsers = [];
 
 
   @override
   Widget build(BuildContext context) {
-    final Size screenSize = MediaQuery.of(context).size;
+    final Size screenSize = MediaQuery
+        .of(context)
+        .size;
     final double screenWidth = screenSize.width;
     final double screenHeight = screenSize.height;
-    final padding = MediaQuery.of(context).padding;
+    final padding = MediaQuery
+        .of(context)
+        .padding;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -59,10 +64,11 @@ class _InfoGroupeState extends State<InfoGroupe> {
           },
         ),
         actions: [
-          (widget.estProprietaire) ?IconTheme(
+          (widget.estProprietaire) ? IconTheme(
             data: IconThemeData(color: Colors.black),
             child: PopupMenuButton<MenuValues>(
-              itemBuilder: (BuildContext context) => [
+              itemBuilder: (BuildContext context) =>
+              [
                 PopupMenuItem(
                   child: Text('Modifier la déstination'),
                   value: MenuValues.ModifierDestination,
@@ -149,129 +155,144 @@ class _InfoGroupeState extends State<InfoGroupe> {
                   if (!snapshot.hasData) {
                     return Text('Il n\'existe aucun groupe');
                   } else {
-                    DateTime dateDepart = snapshot.data!['dateDepart'].toDate();
-                    PlacesAutoCompleteResult lieuArrivee = PlacesAutoCompleteResult(
-                      placeId: snapshot.data!['lieuArrivee']['placeId'],
-                      description: snapshot.data!['lieuArrivee']['description'],
-                      mainText: snapshot.data!['lieuArrivee']['mainText'],
-                      secondaryText: snapshot.data!['lieuArrivee']['secondaryText'],
-                    );
-                    // get les membres du groupe
-                    List<Map<String, dynamic>> membersData = (snapshot.data!['membres'] as List<dynamic>).cast<Map<String, dynamic>>();
-                    if (membersData.isNotEmpty) {
-                      List<Utilisateur> membres = membersData.map((memberData) {
-                        return Utilisateur(
-                            identifiant: memberData['identifiant'],
-                            email: memberData['email'],
-                            numeroDeTelephone: memberData['numeroDeTelephone'],
-                            imageUrl: memberData['imageUrl'],
-                            nomComplet: memberData['nomComplet'],
-                            positionActuel: LatLng(0, 0));
-                      }).toList();
-                      listIdUsers.clear();
-                      for (Utilisateur u in membres) {
-                        listIdUsers.add(u.identifiant);
+                    if (snapshot.data!.exists) {
+                      DateTime dateDepart = snapshot.data!['dateDepart']
+                          .toDate();
+                      PlacesAutoCompleteResult lieuArrivee = PlacesAutoCompleteResult(
+                        placeId: snapshot.data!['lieuArrivee']['placeId'],
+                        description: snapshot
+                            .data!['lieuArrivee']['description'],
+                        mainText: snapshot.data!['lieuArrivee']['mainText'],
+                        secondaryText: snapshot
+                            .data!['lieuArrivee']['secondaryText'],
+                      );
+                      // get les membres du groupe
+                      List<Map<String, dynamic>> membersData = (snapshot
+                          .data!['membres'] as List<dynamic>).cast<Map<
+                          String,
+                          dynamic>>();
+                      if (membersData.isNotEmpty) {
+                        List<Utilisateur> membres = membersData.map((
+                            memberData) {
+                          return Utilisateur(
+                              identifiant: memberData['identifiant'],
+                              email: memberData['email'],
+                              numeroDeTelephone: memberData['numeroDeTelephone'],
+                              imageUrl: memberData['imageUrl'],
+                              nomComplet: memberData['nomComplet'],
+                              positionActuel: LatLng(0, 0));
+                        }).toList();
+                        listIdUsers.clear();
+                        for (Utilisateur u in membres) {
+                          listIdUsers.add(u.identifiant);
+                        }
                       }
-                    }
-                    return Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Text(
-                              'Déstination',
-                              style: TextStyle(
+                      return Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Text(
+                                'Déstination',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    fontFamily: 'Poppins',
+                                    color: Colors.black
+                                ),
+                              ),
+                              Text(
+                                '${lieuArrivee.description}',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'Poppins',
                                   fontWeight: FontWeight.bold,
+                                  color: Colors.indigoAccent[400],
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 20,),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Text(
+                                'Date de départ',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    fontFamily: 'Poppins',
+                                    color: Colors.black
+                                ),
+                              ),
+                              Text(
+                                '${dateDepart.day}/${dateDepart
+                                    .month}/${dateDepart.year}',
+                                style: TextStyle(
                                   fontSize: 16,
                                   fontFamily: 'Poppins',
-                                  color: Colors.black
-                              ),
-                            ),
-                            Text(
-                              '${lieuArrivee.description}',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.bold,
-                                color: Colors.indigoAccent[400],
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 20,),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Text(
-                              'Date de départ',
-                              style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  fontFamily: 'Poppins',
-                                  color: Colors.black
+                                  color: Colors.indigoAccent[400],
+                                ),
                               ),
-                            ),
-                            Text(
-                              '${dateDepart.day}/${dateDepart.month}/${dateDepart.year}',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.bold,
-                                color: Colors.indigoAccent[400],
+                            ],
+                          ),
+                          SizedBox(height: screenHeight / 10,),
+                          Container(
+                            width: screenWidth,
+                            height: screenHeight / 6,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.indigoAccent[400],
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: screenHeight/10,),
-                        Container(
-                          width: screenWidth,
-                          height: screenHeight/6,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.indigoAccent[400],
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            onPressed: (){
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => ConsulterLesMembres(widget.idGroupe, widget.estProprietaire),));
-                            },
-                            child: Text(
-                              'Consulter les membres du groupe',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'Poppins',
-                                  color: Colors.white
+                              onPressed: () {
+                                Navigator.push(context, MaterialPageRoute(
+                                  builder: (context) =>
+                                      ConsulterLesMembres(widget.idGroupe,
+                                          widget.estProprietaire),));
+                              },
+                              child: Text(
+                                'Consulter les membres du groupe',
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontFamily: 'Poppins',
+                                    color: Colors.white
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        SizedBox(height: screenHeight/10,),
-                        Container(
-                          width: screenWidth,
-                          height: screenHeight/6,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.indigoAccent[400],
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                          SizedBox(height: screenHeight / 10,),
+                          Container(
+                            width: screenWidth,
+                            height: screenHeight / 6,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.indigoAccent[400],
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
                               ),
-                            ),
-                            onPressed: (){
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => DeplacementSurLaCarte(widget.idGroupe),));
-                            },
-                            child: Text(
-                              'Consulter le déplacement sur la carte',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'Poppins',
-                                  color: Colors.white
+                              onPressed: () {
+                                Navigator.push(context, MaterialPageRoute(
+                                  builder: (context) =>
+                                      DeplacementSurLaCarte(widget.idGroupe),));
+                              },
+                              child: Text(
+                                'Consulter le déplacement sur la carte',
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontFamily: 'Poppins',
+                                    color: Colors.white
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    );
+                        ],
+                      );
+                    }else return SizedBox(width:0,height : 0);
                   }
                 },
               ),

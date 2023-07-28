@@ -61,6 +61,22 @@ class CloudFirestoreMethodes {
     List<Map<String, dynamic>> invitationsMapList = listeInvitation.map((notification) => notification.toMap()).toList();
     await utilisateurDocRef.update({'invitations': invitationsMapList});
   }
+  Future<void> supprimerInvitation(String uid, int index) async {
+    DocumentReference utilisateurDocRef = _utilisateurCollection.doc(uid);
+    await utilisateurDocRef.get().then((snapshot) {
+      if (snapshot.exists) {
+        List<Map<String, dynamic>> invitations = List<Map<String, dynamic>>.from((snapshot.data() as Map<String, dynamic>)['invitations']);
+        if (index >= 0 && index < invitations.length) {
+          invitations.removeAt(index);
+          utilisateurDocRef.update({'invitations': invitations});
+        } else {
+          throw Exception("Invalid index for invitation deletion.");
+        }
+      } else {
+        throw Exception("Utilisateur does not exist.");
+      }
+    });
+  }
 
   Future<void> ajouterGroupe(String uid, Groupe groupe) async {
     Map<String, dynamic> groupeData = groupe.toMap();
