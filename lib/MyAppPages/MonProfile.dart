@@ -100,7 +100,7 @@ class _MonProfileState extends State<MonProfile> {
                       const SizedBox(
                         height: 4,
                       ),
-                      Text(
+                      SelectableText(
                         utilisateur.email,
                         style: const TextStyle(
                             fontSize: 16,

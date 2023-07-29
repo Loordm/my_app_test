@@ -416,7 +416,7 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                        ),
                     ),
                   Expanded(
-                    child: Text(
+                    child: SelectableText(
                       textAlign: TextAlign.left,
                       email,
                       style: TextStyle(
