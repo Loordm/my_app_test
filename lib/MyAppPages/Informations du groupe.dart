@@ -257,9 +257,19 @@ class _InfoGroupeState extends State<InfoGroupe> {
                                 ),
                               ),
                               onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(
-                                  builder: (context) =>
-                                      DeplacementSurLaCarte(widget.idGroupe,widget.idGroupeOwner,widget.idOwner)));
+                                //if (dateDepart.isBefore(DateTime.now()) || (dateDepart.year == DateTime.now().year && dateDepart.month == DateTime.now().month && dateDepart.day == DateTime.now().day) ) {
+                                  Navigator.push(context, MaterialPageRoute(
+                                      builder: (context) =>
+                                          DeplacementSurLaCarte(widget.idGroupe,widget.idGroupeOwner,widget.idOwner)));
+                                /*}else {
+                                  Duration duration = dateDepart.difference(DateTime.now());
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          duration: const Duration(seconds: 8),content:
+                                      (duration.inHours >= 1) ? Text('Ce n\'est pas encore la date du trajet, il reste encore ${duration.inHours} heur avant la date de départ')
+                                          : Text('Ce n\'est pas encore la date du trajet, il reste encore ${duration.inMinutes} minutes avant la date de départ'))
+                                  );
+                                }*/
                               },
                               child: Text(
                                 'Consulter le déplacement sur la carte',

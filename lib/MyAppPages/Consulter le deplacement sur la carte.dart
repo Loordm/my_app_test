@@ -45,6 +45,9 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
   bool _isLoading = false;
   PlacesAutoCompleteResult lieuArrivee = PlacesAutoCompleteResult(
       placeId: '', description: '', mainText: '', secondaryText: '');
+  String newSnippetOwner = '';
+  String newSnippetMember = '';
+  bool _trajetEstLancee = false ;
 
   /*Future<Uint8List> getBytesFromAsset(String path, int width) async {
     ByteData data = await rootBundle.load(path);
@@ -174,6 +177,34 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
       }
     });
   }
+  void modifierMarker(
+      String markerIdToModify,
+      String newTitle,
+      String newSnippet,
+      LatLng newPosition,
+      ) {
+    Set<Marker> markersCopy = markers.toSet();
+    for (Marker marker in markersCopy) {
+      if (marker.markerId.value == markerIdToModify) {
+        markers.remove(marker);
+        Marker modifiedMarker = Marker(
+          markerId: MarkerId(markerIdToModify),
+          position: newPosition,
+          icon: marker.icon,
+          infoWindow: InfoWindow(
+            title: '                $newTitle                ',
+            snippet: newSnippet,
+          ),
+        );
+        markers.add(modifiedMarker);
+        break;
+      }
+    }
+  }
+
+
+
+
 
   void setPolylines(LatLng depart, LatLng arrive) async {
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
@@ -243,6 +274,14 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
     } else {
       throw Exception('Failed to load place');
     }
+  }
+  void getUserPlace(LatLng latLngPositionActuel,String placeActuel)async{
+    PlacesAutoCompleteResult lieuActuel = await getPlaceFromLatLng(
+        latLngPositionActuel.latitude,
+        latLngPositionActuel.longitude);
+        placeActuel = (lieuActuel.description != null)
+        ? lieuActuel.description!
+        : '';
   }
 
   late GoogleMapController mapController;
@@ -400,6 +439,16 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
                                     // et il faut qu'il fait partie du groupe
                                     owner = Utilisateur.creerUtilisateurVide();
                                     owner = utilisateur;
+                                    if (_trajetEstLancee){
+                                       getUserPlace(owner.positionActuel,newSnippetOwner);
+                                       modifierMarker(owner.imageUrl, owner.nomComplet, newSnippetOwner, owner.positionActuel);
+                                       print(
+                                           '************************************');
+                                       print(
+                                           'marker has been modified for ${owner.email}');
+                                       print(
+                                           '************************************');
+                                    }
                                     print(
                                         '************************************');
                                     print(
@@ -413,6 +462,16 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
                                     // si ce utilisateur est un membre
                                     // et il faut qu'il fait partie du groupe
                                     resteUsers.add(utilisateur);
+                                    if (_trajetEstLancee){
+                                      getUserPlace(utilisateur.positionActuel,newSnippetMember);
+                                      modifierMarker(utilisateur.imageUrl, utilisateur.nomComplet, newSnippetMember, utilisateur.positionActuel);
+                                      print(
+                                          '************************************');
+                                      print(
+                                          'marker has been modified for ${utilisateur.email}');
+                                      print(
+                                          '************************************');
+                                    }
                                   }
                                   for (Utilisateur s in resteUsers) {
                                     print(
@@ -527,6 +586,7 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
               setState(() {
                 _isLoading = false;
                 _boutonvisible = false;
+                _trajetEstLancee = true;
               });
             },
             child: SizedBox(
