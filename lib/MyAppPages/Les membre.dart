@@ -43,17 +43,16 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     final double screenWidth = screenSize.width;
-    final double screenHeight = screenSize.height;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Align(
+        title: const Align(
           alignment: Alignment.center,
           child: Text(
             'Les membres',
             style: TextStyle(
-                fontSize: 30,
+                fontSize: 26,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
                 fontFamily: 'Poppins'),
@@ -71,17 +70,17 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
         ),
         actions: [
           IconTheme(
-              data: IconThemeData(color: Colors.black),
+              data: const IconThemeData(color: Colors.black),
               child: (widget.estProprietaire)
                   ? PopupMenuButton<MenuValuesProprietaire>(
                       itemBuilder: (BuildContext context) => [
-                        PopupMenuItem<MenuValuesProprietaire>(
-                          child: Text('Supprimer le groupe'),
+                        const PopupMenuItem<MenuValuesProprietaire>(
                           value: MenuValuesProprietaire.SupprimerGroupe,
+                          child: Text('Supprimer le groupe'),
                         ),
-                        PopupMenuItem<MenuValuesProprietaire>(
-                          child: Text('Inviter un membre'),
+                        const PopupMenuItem<MenuValuesProprietaire>(
                           value: MenuValuesProprietaire.InviterUnMembre,
+                          child: Text('Inviter un membre'),
                         ),
                       ],
                       onSelected: (value) {
@@ -91,19 +90,19 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                               context: context,
                               builder: (BuildContext context) {
                                 return AlertDialog(
-                                  title: Text('Supprimer le groupe'),
+                                  title: const Text('Supprimer le groupe'),
                                   actions: [
                                     TextButton(
                                       onPressed: () {
                                         Navigator.of(context).pop();
                                       },
-                                      child: Text('Supprimer'),
+                                      child: const Text('Supprimer'),
                                     ),
                                     TextButton(
                                       onPressed: () {
                                         Navigator.of(context).pop();
                                       },
-                                      child: Text('Annuler'),
+                                      child: const Text('Annuler'),
                                     ),
                                   ],
                                 );
@@ -115,19 +114,19 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                               context: context,
                               builder: (BuildContext context) {
                                 return AlertDialog(
-                                  title: Text('Inviter un membre'),
+                                  title: const Text('Inviter un membre'),
                                   actions: [
                                     TextButton(
                                       onPressed: () {
                                         Navigator.of(context).pop();
                                       },
-                                      child: Text('Inviter'),
+                                      child: const Text('Inviter'),
                                     ),
                                     TextButton(
                                       onPressed: () {
                                         Navigator.of(context).pop();
                                       },
-                                      child: Text('Annuler'),
+                                      child: const Text('Annuler'),
                                     ),
                                   ],
                                 );
@@ -139,9 +138,9 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                     )
                   : PopupMenuButton<MenuValuesMembre>(
                       itemBuilder: (BuildContext context) => [
-                        PopupMenuItem<MenuValuesMembre>(
-                          child: Text('Quitter le groupe'),
+                        const PopupMenuItem<MenuValuesMembre>(
                           value: MenuValuesMembre.QuitterLeGroupe,
+                          child: Text('Quitter le groupe'),
                         ),
                       ],
                       onSelected: (value) {
@@ -150,20 +149,20 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                             context: context,
                             builder: (BuildContext context) {
                               return AlertDialog(
-                                title: Text('Quitter le groupe'),
+                                title: const Text('Quitter le groupe'),
                                 actions: [
                                   TextButton(
                                     onPressed: () async {
                                       Navigator.of(context).pop();
                                     },
-                                    child: Text('Quitter'),
+                                    child: const Text('Quitter'),
                                   ),
                                   TextButton(
                                     onPressed: () {
                                       Navigator.of(context)
                                           .pop(); // Close the dialog
                                     },
-                                    child: Text('Annuler'),
+                                    child: const Text('Annuler'),
                                   ),
                                 ],
                               );
@@ -203,7 +202,7 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                   stream: utilisateurCollection.snapshots(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
-                      return Center(child: const Text('Il n\'existe aucun membre'));
+                      return const Center(child: Text('Il n\'existe aucun membre'));
                     } else {
                       resteUsers.clear();
                       listMembersWidget.clear();
@@ -250,14 +249,14 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                       }
                       return Column(
                         children: [
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
                           (!widget.estProprietaire)
                               ? Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(24, 8, 4, 0),
+                              const Padding(
+                                padding: EdgeInsets.fromLTRB(24, 8, 4, 0),
                                 child: Text(
                                   'Le propriétaire',
                                   style: TextStyle(
@@ -267,7 +266,7 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                                       color: Colors.black),
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 10,
                               ),
                               InfoUserContainer(
@@ -280,7 +279,7 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                                   ''),
                             ],
                           )
-                              : Text(
+                              : const Text(
                             textAlign: TextAlign.center,
                             'Vous êtes le propriétaire',
                             style: TextStyle(
@@ -288,12 +287,12 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                                 fontFamily: 'Poppins',
                                 color: Colors.black),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           (resteUsers.isNotEmpty)
-                              ? Padding(
-                            padding: const EdgeInsets.fromLTRB(24, 8, 4, 0),
+                              ? const Padding(
+                            padding: EdgeInsets.fromLTRB(24, 8, 4, 0),
                             child: Align(
                               alignment: Alignment.centerLeft,
                               child: Text(
@@ -306,16 +305,19 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                               ),
                             ),
                           )
-                              : Center(
+                              : Padding(
+                                padding: const EdgeInsets.all(24.0),
+                                child: const Center(
                             child: Text(
-                              'Aucun membre pour le moment',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'Poppins',
-                                  color: Colors.black),
+                                'Aucun membre pour le moment',
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontFamily: 'Poppins',
+                                    color: Colors.black),
                             ),
                           ),
-                          SizedBox(
+                              ),
+                          const SizedBox(
                             height: 10,
                           ),
                           Column(
@@ -349,90 +351,102 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
       String uidGroupe) {
     final Size screenSize = MediaQuery.of(context).size;
     final double screenWidth = screenSize.width;
-    final double screenHeight = screenSize.height;
-    final padding = MediaQuery.of(context).padding;
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
       ),
       width: screenWidth,
-      padding: EdgeInsets.fromLTRB(4, 8, 4, 0),
-      margin: EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-      height: (ableToDelete && widget.estProprietaire) ? 210 : 180,
+      padding: const EdgeInsets.fromLTRB(4, 8, 4, 0),
+      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
       child: Column(
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
-            child: Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(100),
-                  child: Image.network(
-                    '$imageUrl',
-                    fit: BoxFit.cover,
-                    width: screenWidth / 7,
-                    height: screenWidth / 7,
+            child: SizedBox(
+              width: screenWidth,
+              child: Row(
+                children: [
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: Image.network(
+                        imageUrl,
+                        fit: BoxFit.cover,
+                        width: screenWidth / 7,
+                        height: screenWidth / 7,
+                      ),
+                    ),
                   ),
-                ),
-                Text(
-                  '  $nomComplet',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w300,
-                    color: Colors.black,
+                  Expanded(
+                    child: Text(
+                      textAlign : TextAlign.left,
+                      '  $nomComplet',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w300,
+                        color: Colors.black,
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 0, 0, 0),
-            child: Row(
-              children: [
-                Text(
-                  'Email :',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black),
-                ),
-                SizedBox(
-                  width: screenWidth / 10,
-                ),
-                Text(
-                  '$email',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'Poppins',
-                    color: Colors.indigoAccent[400],
+            child: SizedBox(
+              width: screenWidth,
+              child: Row(
+                children: [
+                    const Align(
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                      'Email :      ',
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black),
+                       ),
+                    ),
+                  Expanded(
+                    child: Text(
+                      textAlign: TextAlign.left,
+                      email,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'Poppins',
+                        color: Colors.indigoAccent[400],
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Container(
             width: screenWidth,
-            margin: EdgeInsets.symmetric(horizontal: 8),
+            margin: const EdgeInsets.symmetric(horizontal: 8),
             child: OutlinedButton(
               style: OutlinedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  side: BorderSide(
+                  side: const BorderSide(
                     width: 1.4,
                     color: Colors.indigoAccent,
                   )),
               onPressed: () {
-                launchUrlString("tel:${numeroDeTelephone}");
+                launchUrlString("tel:$numeroDeTelephone");
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -442,11 +456,11 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                     Icons.phone_in_talk,
                     color: Colors.indigoAccent[400],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                   Text(
-                    '${numeroDeTelephone}',
+                    numeroDeTelephone,
                     style: TextStyle(
                       fontSize: 16,
                       fontFamily: 'Poppins',
@@ -465,14 +479,10 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                       builder: (BuildContext context) {
                         return AlertDialog(
                           title:
-                              Text('Voulez vous supprimer cet utilisateur ?'),
+                              const Text('Voulez vous supprimer cet utilisateur ?'),
                           actions: [
                             TextButton(
                               onPressed: () async {
-                                print('**********************************************');
-                                print('index = $index');
-                                print('widget.idGroupeOwner = ${widget.idGroupeOwner}');
-                                print('**********************************************');
                                 await _cloudFirestore
                                     .supprimerUtilisateurAuGroupe(
                                         auth.currentUser!.uid,
@@ -480,28 +490,29 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                                         index);
                                 Navigator.of(context).pop();
                               },
-                              child: Text('Oui'),
+                              child: const Text('Oui'),
                             ),
                             TextButton(
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
-                              child: Text('Annuler'),
+                              child: const Text('Annuler'),
                             ),
                           ],
                         );
                       },
                     );
                   },
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.remove_circle_outline,
                     color: Colors.red,
                     size: 28,
                   ))
-              : SizedBox(
+              : const SizedBox(
                   width: 0,
                   height: 0,
                 ),
+          const SizedBox(height: 20,),
         ],
       ),
     );

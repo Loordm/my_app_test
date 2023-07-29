@@ -34,14 +34,14 @@ class _ChoixLieuArriveeState extends State<ChoixLieuArrivee> {
     final Size size = MediaQuery.of(context).size;
     return AlertDialog(
       backgroundColor: Colors.white,
-      content: Container(
+      content: SizedBox(
         width: 700,
         height: 600,
         child: SingleChildScrollView(
           child: Column(
             children: [
               Padding(
-                padding:  EdgeInsets.all(16),
+                padding:  const EdgeInsets.all(16),
                 child: Column(
                   children: [
                     Form(
@@ -55,7 +55,7 @@ class _ChoixLieuArriveeState extends State<ChoixLieuArrivee> {
                             querry = value;
                           });
                         },
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: 'Lieu',
                         ),
                       ),
@@ -115,11 +115,11 @@ class _ChoixLieuArriveeState extends State<ChoixLieuArrivee> {
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Center(
-                                        child: (lieuArrivee == null) ?Text(
+                                        child: (lieuArrivee == null) ?const Text(
                                           'Pas de résultat, tapez clairment votre lieu',
                                           style: TextStyle(fontFamily: 'poppins'),
                                         )
-                                        : Text(''),
+                                        : const Text(''),
                                       ),
                                     ));
                               }
@@ -130,8 +130,8 @@ class _ChoixLieuArriveeState extends State<ChoixLieuArrivee> {
                               );
                             }
                           }),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8.0),
                       ),
                     ),
                   ]),
@@ -152,9 +152,9 @@ class _ChoixLieuArriveeState extends State<ChoixLieuArrivee> {
             );
           }
         },
-            child: Text('Ok')),
+            child: const Text('Ok')),
         TextButton(onPressed: () => Navigator.pop(context)
-            , child: Text('Annuler'))
+            , child: const Text('Annuler'))
       ],
     );
   }

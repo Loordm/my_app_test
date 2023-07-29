@@ -13,14 +13,13 @@ class Acceuil extends StatefulWidget {
 class _AcceuilState extends State<Acceuil> {
   int _selectedIndex = 0 ;
   List<Widget> listWidgets = <Widget>[
-    MesGroupes(),
-    MesInvitations(),
-    MonProfile()
+    const MesGroupes(),
+    const MesInvitations(),
+    const MonProfile()
   ];
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
-    final double screenWidth = screenSize.width;
     final double screenHeight = screenSize.height;
     return Scaffold(
       bottomNavigationBar: NavigationBar(
@@ -29,7 +28,7 @@ class _AcceuilState extends State<Acceuil> {
           _selectedIndex = index ;
         }),
         height: screenHeight/13.2,
-        destinations: [
+        destinations: const [
           NavigationDestination(
             icon: Icon(Icons.home_outlined),
             label: 'Mes groupes',

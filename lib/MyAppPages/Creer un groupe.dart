@@ -66,7 +66,7 @@ class _CreerGroupeState extends State<CreerGroupe> {
             child: Text(
               'Créer un groupe',
               style: TextStyle(
-                  fontSize: 30,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                   fontFamily: 'Poppins'),
@@ -196,45 +196,48 @@ class _CreerGroupeState extends State<CreerGroupe> {
                 const SizedBox(
                   height: 20,
                 ),
-                Row(
-                  children: [
-                    const Text(
-                      'Inviter des membres',
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Poppins',
-                          color: Colors.black),
-                    ),
-                    const SizedBox(
-                      width: 20,
-                    ),
-                    IconButton(
-                        onPressed: () async {
-                          final emailValue = await showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            builder: (context) {
-                              return const InviterUnMembre();
-                            },
-                          );
-                          if (emailValue != null && emailValue.isNotEmpty) {
-                            setState(() {
-                              emailListWidget.add(EmailWidget(emailValue));
-                              emailListWidget.add(const SizedBox(
-                                height: 20,
-                              ));
-                              emailListString.add(emailValue);
-                              emailListString.add('');
-                            });
-                          }
-                        },
-                        icon: Icon(
-                          Icons.add_circle_outline,
-                          color: Colors.indigoAccent[400],
-                          size: 30,
-                        ))
-                  ],
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      const Text(
+                        'Inviter des membres',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Poppins',
+                            color: Colors.black),
+                      ),
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      IconButton(
+                          onPressed: () async {
+                            final emailValue = await showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) {
+                                return const InviterUnMembre();
+                              },
+                            );
+                            if (emailValue != null && emailValue.isNotEmpty) {
+                              setState(() {
+                                emailListWidget.add(EmailWidget(emailValue));
+                                emailListWidget.add(const SizedBox(
+                                  height: 20,
+                                ));
+                                emailListString.add(emailValue);
+                                emailListString.add('');
+                              });
+                            }
+                          },
+                          icon: Icon(
+                            Icons.add_circle_outline,
+                            color: Colors.indigoAccent[400],
+                            size: 30,
+                          ))
+                    ],
+                  ),
                 ),
                 const SizedBox(
                   height: 20,
@@ -254,49 +257,53 @@ class _CreerGroupeState extends State<CreerGroupe> {
           height: 56,
           child: ElevatedButton(
             onPressed: () async {
-              setState(() {
-                isLoading = true;
-              });
-              Groupe groupe = Groupe(
-                  lieuArrivee: lieuArrivee!,
-                  dateDepart: dateDepart,
-                  idOwner: auth.currentUser!.uid,
-                  idGroupeOwner: ''
-              );
-              await _cloudFirestore.ajouterGroupe(
-                  FirebaseAuth.instance.currentUser!.uid, groupe,'');
-              // envoier les invitations
-              for (String emailValue in emailListString) {
-                if (emailValue.isNotEmpty) {
-                  QuerySnapshot querySnapshot = await utilisateurCollection
-                      .where('email', isEqualTo: emailValue)
-                      .get();
-                  // email est unique, donc elle retourne un seul utilisateur
-                  if (querySnapshot.docs.isNotEmpty) {
-                    for (QueryDocumentSnapshot utilisateurDoc
-                        in querySnapshot.docs) {
-                      Map<String, dynamic> dataUtilisateur =
-                          utilisateurDoc.data() as Map<String, dynamic>;
-                      if (dataUtilisateur.isNotEmpty) {
-                        Invitation invitation = Invitation(
-                            idEnvoyeur: auth.currentUser!.uid,
-                            idRecepteur: dataUtilisateur['identifiant'],
-                            idGroupe: groupe.idGroupe,
-                            acceptation: false,
-                            dejaTraite: false);
-                        await _cloudFirestore.envoyerInvitation(
-                            invitation.idRecepteur, invitation);
+              if (lieuArrivee != null && lieuArrivee!.description!.isNotEmpty){
+                setState(() {
+                  isLoading = true;
+                });
+                Groupe groupe = Groupe(
+                    lieuArrivee: lieuArrivee!,
+                    dateDepart: dateDepart,
+                    idOwner: auth.currentUser!.uid,
+                    idGroupeOwner: '');
+                await _cloudFirestore.ajouterGroupe(
+                    FirebaseAuth.instance.currentUser!.uid, groupe, '');
+                // envoier les invitations
+                for (String emailValue in emailListString) {
+                  if (emailValue.isNotEmpty) {
+                    QuerySnapshot querySnapshot = await utilisateurCollection
+                        .where('email', isEqualTo: emailValue)
+                        .get();
+                    // email est unique, donc elle retourne un seul utilisateur
+                    if (querySnapshot.docs.isNotEmpty) {
+                      for (QueryDocumentSnapshot utilisateurDoc
+                          in querySnapshot.docs) {
+                        Map<String, dynamic> dataUtilisateur =
+                            utilisateurDoc.data() as Map<String, dynamic>;
+                        if (dataUtilisateur.isNotEmpty) {
+                          Invitation invitation = Invitation(
+                              idEnvoyeur: auth.currentUser!.uid,
+                              idRecepteur: dataUtilisateur['identifiant'],
+                              idGroupe: groupe.idGroupe,
+                              acceptation: false,
+                              dejaTraite: false);
+                          await _cloudFirestore.envoyerInvitation(
+                              invitation.idRecepteur, invitation);
+                        }
                       }
-                    }
-                  } // fin si il ya une resultat de recherche
-                } // fin si email est non vide
+                    } // fin si il ya une resultat de recherche
+                  } // fin si email est non vide
+                }
+                setState(() {
+                  isLoading = false;
+                });
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Création du groupe avec succée')));
+                Navigator.pop(context);
+              }else {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Vous devez donner le lieu d\'arrivée pour pouvoir créer un groupe')));
               }
-              setState(() {
-                isLoading = false;
-              });
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Création du groupe avec succée')));
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.indigoAccent[400],

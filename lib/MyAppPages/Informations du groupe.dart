@@ -3,10 +3,7 @@ import 'package:app_test/MyAppPages/Les%20membre.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:places_service/places_service.dart';
-
-import '../MyAppClasses/Utilisateur.dart';
 
 class InfoGroupe extends StatefulWidget {
   String idGroupe;
@@ -44,12 +41,12 @@ class _InfoGroupeState extends State<InfoGroupe> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Align(
+        title: const Align(
           alignment: Alignment.center,
           child: Text(
             'Groupe',
             style: TextStyle(
-                fontSize: 30,
+                fontSize: 26,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
                 fontFamily: 'Poppins'),
@@ -67,17 +64,17 @@ class _InfoGroupeState extends State<InfoGroupe> {
         ),
         actions: [
           (widget.estProprietaire) ? IconTheme(
-            data: IconThemeData(color: Colors.black),
+            data: const IconThemeData(color: Colors.black),
             child: PopupMenuButton<MenuValues>(
               itemBuilder: (BuildContext context) =>
               [
-                PopupMenuItem(
-                  child: Text('Modifier la déstination'),
+                const PopupMenuItem(
                   value: MenuValues.ModifierDestination,
+                  child: Text('Modifier la déstination'),
                 ),
-                PopupMenuItem(
-                  child: Text('Modifier la date de départ'),
+                const PopupMenuItem(
                   value: MenuValues.ModifierDateDepart,
+                  child: Text('Modifier la date de départ'),
                 ),
               ],
               onSelected: (value) {
@@ -87,19 +84,19 @@ class _InfoGroupeState extends State<InfoGroupe> {
                       context: context,
                       builder: (BuildContext context) {
                         return AlertDialog(
-                          title: Text('Modifier la déstination'),
+                          title: const Text('Modifier la déstination'),
                           actions: [
                             TextButton(
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
-                              child: Text('Modifier'),
+                              child: const Text('Modifier'),
                             ),
                             TextButton(
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
-                              child: Text('Annuler'),
+                              child: const Text('Annuler'),
                             ),
                           ],
                         );
@@ -111,19 +108,19 @@ class _InfoGroupeState extends State<InfoGroupe> {
                       context: context,
                       builder: (BuildContext context) {
                         return AlertDialog(
-                          title: Text('Modifier la date de départ'),
+                          title: const Text('Modifier la date de départ'),
                           actions: [
                             TextButton(
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
-                              child: Text('Modifier'),
+                              child: const Text('Modifier'),
                             ),
                             TextButton(
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
-                              child: Text('Annuler'),
+                              child: const Text('Annuler'),
                             ),
                           ],
                         );
@@ -155,7 +152,7 @@ class _InfoGroupeState extends State<InfoGroupe> {
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
-                    return Text('Il n\'existe aucun groupe');
+                    return const Text('Il n\'existe aucun groupe');
                   } else {
                     if (snapshot.data!.exists) {
                       DateTime dateDepart = snapshot.data!['dateDepart']
@@ -170,56 +167,71 @@ class _InfoGroupeState extends State<InfoGroupe> {
                       );
                       return Column(
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Text(
-                                'Déstination',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    fontFamily: 'Poppins',
-                                    color: Colors.black
+                          SizedBox(
+                            width: screenWidth,
+                            child: Row(
+                              children: [
+                                const Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(
+                                    'Déstination',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        fontFamily: 'Poppins',
+                                        color: Colors.black
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                '${lieuArrivee.description}',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'Poppins',
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.indigoAccent[400],
+                                Expanded(
+                                  child: Text(
+                                    textAlign: TextAlign.right,
+                                    '${lieuArrivee.description}',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontFamily: 'Poppins',
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.indigoAccent[400],
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                          SizedBox(height: 20,),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Text(
-                                'Date de départ',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    fontFamily: 'Poppins',
-                                    color: Colors.black
+                          const SizedBox(height: 20,),
+                          SizedBox(
+                            width: screenWidth,
+                            child: Row(
+                              children: [
+                                const Align(
+                                  child: Text(
+                                    'Date de départ',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        fontFamily: 'Poppins',
+                                        color: Colors.black
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                '${dateDepart.day}/${dateDepart
-                                    .month}/${dateDepart.year}',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'Poppins',
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.indigoAccent[400],
+                                Expanded(
+                                  child: Text(
+                                    textAlign: TextAlign.right,
+                                    '${dateDepart.day}/${dateDepart
+                                        .month}/${dateDepart.year}',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontFamily: 'Poppins',
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.indigoAccent[400],
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                           SizedBox(height: screenHeight / 10,),
-                          Container(
+                          SizedBox(
                             width: screenWidth,
                             height: screenHeight / 6,
                             child: ElevatedButton(
@@ -235,10 +247,11 @@ class _InfoGroupeState extends State<InfoGroupe> {
                                       ConsulterLesMembres(widget.idGroupe,
                                           widget.estProprietaire,widget.idGroupeOwner,widget.idOwner),));
                               },
-                              child: Text(
+                              child: const Text(
+                                textAlign: TextAlign.center,
                                 'Consulter les membres du groupe',
                                 style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 15,
                                     fontFamily: 'Poppins',
                                     color: Colors.white
                                 ),
@@ -246,7 +259,7 @@ class _InfoGroupeState extends State<InfoGroupe> {
                             ),
                           ),
                           SizedBox(height: screenHeight / 10,),
-                          Container(
+                          SizedBox(
                             width: screenWidth,
                             height: screenHeight / 6,
                             child: ElevatedButton(
@@ -257,11 +270,11 @@ class _InfoGroupeState extends State<InfoGroupe> {
                                 ),
                               ),
                               onPressed: () {
-                                //if (dateDepart.isBefore(DateTime.now()) || (dateDepart.year == DateTime.now().year && dateDepart.month == DateTime.now().month && dateDepart.day == DateTime.now().day) ) {
+                                if (dateDepart.isBefore(DateTime.now()) || (dateDepart.year == DateTime.now().year && dateDepart.month == DateTime.now().month && dateDepart.day == DateTime.now().day) ) {
                                   Navigator.push(context, MaterialPageRoute(
                                       builder: (context) =>
                                           DeplacementSurLaCarte(widget.idGroupe,widget.idGroupeOwner,widget.idOwner)));
-                                /*}else {
+                                }else {
                                   Duration duration = dateDepart.difference(DateTime.now());
                                   ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
@@ -269,12 +282,13 @@ class _InfoGroupeState extends State<InfoGroupe> {
                                       (duration.inHours >= 1) ? Text('Ce n\'est pas encore la date du trajet, il reste encore ${duration.inHours} heur avant la date de départ')
                                           : Text('Ce n\'est pas encore la date du trajet, il reste encore ${duration.inMinutes} minutes avant la date de départ'))
                                   );
-                                }*/
+                                }
                               },
-                              child: Text(
+                              child: const Text(
+                                textAlign: TextAlign.center,
                                 'Consulter le déplacement sur la carte',
                                 style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 15,
                                     fontFamily: 'Poppins',
                                     color: Colors.white
                                 ),
@@ -283,7 +297,9 @@ class _InfoGroupeState extends State<InfoGroupe> {
                           ),
                         ],
                       );
-                    }else return SizedBox(width:0,height : 0);
+                    }else {
+                      return const SizedBox(width:0,height : 0);
+                    }
                   }
                 },
               ),

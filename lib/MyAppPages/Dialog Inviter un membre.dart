@@ -14,11 +14,9 @@ class _InviterUnMembreState extends State<InviterUnMembre> {
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     final double screenWidth = screenSize.width;
-    final double screenHeight = screenSize.height;
-    final padding = MediaQuery.of(context).padding;
     return AlertDialog(
       backgroundColor: Colors.grey[300],
-      title: Text(
+      title: const Text(
         'Inviter un membre',
         style: TextStyle(
             fontSize: 26,
@@ -26,14 +24,14 @@ class _InviterUnMembreState extends State<InviterUnMembre> {
             color: Colors.black,
             fontFamily: 'Poppins'),
       ),
-      content: Container(
+      content: SizedBox(
         width: screenWidth,
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'Donnez l’email de votre partenaire',
                 style: TextStyle(
                     fontSize: 14,
@@ -44,7 +42,7 @@ class _InviterUnMembreState extends State<InviterUnMembre> {
               TextFormField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                     hintText: 'Email',
                     hintStyle: TextStyle(fontFamily: 'Poppins', fontSize: 14)),
               ),
@@ -66,7 +64,7 @@ class _InviterUnMembreState extends State<InviterUnMembre> {
                   color: Colors.indigoAccent[400]),
             )
         ),
-        SizedBox(width: 10,),
+        const SizedBox(width: 10,),
         TextButton(
             onPressed: () => Navigator.pop(context), child: Text(
             'Annuler',

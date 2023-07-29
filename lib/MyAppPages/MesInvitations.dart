@@ -37,7 +37,7 @@ class _MesInvitationsState extends State<MesInvitations> {
             child: Text(
               'Mes Invitations',
               style: TextStyle(
-                  fontSize: 30,
+                  fontSize: 26,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                   fontFamily: 'Poppins'),
@@ -147,9 +147,6 @@ class _MesInvitationsState extends State<MesInvitations> {
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     width: screenWidth,
-                                    height: (!invitations[index].dejaTraite)
-                                        ? screenHeight / 2.6
-                                        : screenHeight / 3.2,
                                     padding: const EdgeInsets.fromLTRB(4, 8, 4, 0),
                                     margin: const EdgeInsets.symmetric(
                                         horizontal: 24, vertical: 24),
@@ -158,64 +155,70 @@ class _MesInvitationsState extends State<MesInvitations> {
                                         Padding(
                                           padding: const EdgeInsets.fromLTRB(
                                               8, 0, 0, 0),
-                                          child: Row(
-                                            children: [
-                                              ClipRRect(
-                                                borderRadius: BorderRadius
-                                                    .circular(100),
-                                                child: Image.network(
-                                                  utilisateur.imageUrl,
-                                                  fit: BoxFit.cover,
-                                                  width: screenWidth / 7,
-                                                  height: screenWidth / 7,
-                                                ),
-                                              ),
-                                              Column(
+                                          child: SingleChildScrollView(
+                                            scrollDirection: Axis.horizontal,
+                                            child: SizedBox(
+                                              width: screenWidth,
+                                              child: Row(
                                                 children: [
-                                                  Text(
-                                                    '  ${utilisateur
-                                                        .nomComplet}',
-                                                    style: const TextStyle(
-                                                      fontSize: 16,
-                                                      fontFamily: 'Poppins',
-                                                      fontWeight: FontWeight
-                                                          .w300,
-                                                      color: Colors.black,
+                                                  Align(
+                                                    alignment: Alignment.topLeft,
+                                                    child: ClipRRect(
+                                                      borderRadius: BorderRadius
+                                                          .circular(100),
+                                                      child: Image.network(
+                                                        utilisateur.imageUrl,
+                                                        fit: BoxFit.cover,
+                                                        width: screenWidth / 7,
+                                                        height: screenWidth / 7,
+                                                      ),
                                                     ),
                                                   ),
-                                                  Row(
-                                                    children: [
-                                                      Text(
-                                                        '  ${utilisateur
-                                                            .numeroDeTelephone}',
-                                                        style: TextStyle(
-                                                          fontSize: 16,
-                                                          fontFamily: 'Poppins',
-                                                          fontWeight: FontWeight
-                                                              .w300,
-                                                          color: Colors
-                                                              .indigoAccent[400],
+                                                  Expanded(
+                                                    child: Column(
+                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Text(
+                                                          '  ${utilisateur
+                                                              .nomComplet}',
+                                                          style: const TextStyle(
+                                                            fontSize: 16,
+                                                            fontFamily: 'Poppins',
+                                                            fontWeight: FontWeight
+                                                                .w300,
+                                                            color: Colors.black,
+                                                          ),
                                                         ),
-                                                      ),
-                                                      SizedBox(
-                                                        width: screenWidth /
-                                                            20,),
-                                                      Text(
-                                                        utilisateur.email,
-                                                        style: TextStyle(
-                                                          fontSize: 16,
-                                                          fontFamily: 'Poppins',
-                                                          fontWeight: FontWeight
-                                                              .w300,
-                                                          color: Colors
-                                                              .indigoAccent[400],
+                                                        SelectableText(
+                                                          '  ${utilisateur
+                                                              .numeroDeTelephone}    ',
+                                                          style: TextStyle(
+                                                            fontSize: 15,
+                                                            fontFamily: 'Poppins',
+                                                            fontWeight: FontWeight
+                                                                .w300,
+                                                            color: Colors
+                                                                .indigoAccent[400],
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
+                                                        SelectableText(
+                                                          '  ${utilisateur.email}',
+                                                          style: TextStyle(
+                                                            fontSize: 15,
+                                                            fontFamily: 'Poppins',
+                                                            fontWeight: FontWeight
+                                                                .w300,
+                                                            color: Colors
+                                                                .indigoAccent[400],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ],
                                               ),
-                                            ],
+                                            ),
                                           ),
                                         ),
                                         const SizedBox(height: 6,),
@@ -229,6 +232,7 @@ class _MesInvitationsState extends State<MesInvitations> {
                                                 .center,
                                             children: [
                                               const Text(
+                                                textAlign: TextAlign.center,
                                                 'Invitation pour rejoindre le groupe de Grine Mohammed pour allez vers :',
                                                 style: TextStyle(
                                                   fontSize: 16,
@@ -238,6 +242,7 @@ class _MesInvitationsState extends State<MesInvitations> {
                                                 ),
                                               ),
                                               Text(
+                                                textAlign: TextAlign.center,
                                                 '${lieuArrivee
                                                     .description}, le ${dateDepart
                                                     .day}/${dateDepart
@@ -256,7 +261,6 @@ class _MesInvitationsState extends State<MesInvitations> {
                                                 children: [
                                                   SizedBox(
                                                     width: screenWidth,
-                                                    height: 50,
                                                     child: ElevatedButton(
                                                       style: ElevatedButton
                                                           .styleFrom(
@@ -281,11 +285,9 @@ class _MesInvitationsState extends State<MesInvitations> {
                                                         await _cloudFirestore.ajouterGroupe(auth.currentUser!.uid, groupe,invitation.idGroupe);
                                                         await _cloudFirestore.ajouterUtilisateurAuGroupe(groupe.idOwner, invitation.idGroupe, auth.currentUser!.uid);
                                                         /// ajouter cet utilisateur a toutes les membres du groupe du owner
-
                                                       },
                                                       child: SizedBox(
                                                         width: screenWidth,
-                                                        height: 50,
                                                         child: Row(
                                                           children: [
                                                             Container(
@@ -299,15 +301,18 @@ class _MesInvitationsState extends State<MesInvitations> {
                                                               child: Align(
                                                                 alignment: Alignment
                                                                     .center,
-                                                                child: Text(
-                                                                  'Accepter l\'invitation',
-                                                                  style: TextStyle(
-                                                                    fontSize: 16,
-                                                                    fontFamily: 'Poppins',
-                                                                    fontWeight: FontWeight
-                                                                        .bold,
-                                                                    color: Colors
-                                                                        .green[600],
+                                                                child: Padding(
+                                                                  padding: const EdgeInsets.all(16.0),
+                                                                  child: Text(
+                                                                    'Accepter l\'invitation',
+                                                                    style: TextStyle(
+                                                                      fontSize: 16,
+                                                                      fontFamily: 'Poppins',
+                                                                      fontWeight: FontWeight
+                                                                          .bold,
+                                                                      color: Colors
+                                                                          .green[600],
+                                                                    ),
                                                                   ),
                                                                 ),
                                                               ),
@@ -321,7 +326,6 @@ class _MesInvitationsState extends State<MesInvitations> {
                                                     height: screenHeight / 40,),
                                                   SizedBox(
                                                     width: screenWidth,
-                                                    height: 50,
                                                     child: ElevatedButton(
                                                       style: ElevatedButton
                                                           .styleFrom(
@@ -360,15 +364,18 @@ class _MesInvitationsState extends State<MesInvitations> {
                                                             child: Align(
                                                               alignment: Alignment
                                                                   .center,
-                                                              child: Text(
-                                                                'Réfuser l\'invitation',
-                                                                style: TextStyle(
-                                                                  fontSize: 16,
-                                                                  fontFamily: 'Poppins',
-                                                                  fontWeight: FontWeight
-                                                                      .bold,
-                                                                  color: Colors
-                                                                      .red[600],
+                                                              child: Padding(
+                                                                padding: const EdgeInsets.all(16.0),
+                                                                child: Text(
+                                                                  'Réfuser l\'invitation',
+                                                                  style: TextStyle(
+                                                                    fontSize: 16,
+                                                                    fontFamily: 'Poppins',
+                                                                    fontWeight: FontWeight
+                                                                        .bold,
+                                                                    color: Colors
+                                                                        .red[600],
+                                                                  ),
                                                                 ),
                                                               ),
                                                             ),
@@ -428,10 +435,11 @@ class _MesInvitationsState extends State<MesInvitations> {
 
                                                   ],
                                                 ),
-                                              )
+                                              ),
                                             ],
                                           ),
                                         ),
+                                        const SizedBox(height: 20,),
                                       ],
                                     ),
                                   );
@@ -448,6 +456,7 @@ class _MesInvitationsState extends State<MesInvitations> {
                   },
                 ) : const Center(
                   child: Text(
+                    textAlign: TextAlign.center,
                     'Vous n\'avez aucune invitation pour le moment',
                     style: TextStyle(
                         color: Colors.black,

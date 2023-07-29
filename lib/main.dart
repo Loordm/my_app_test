@@ -8,7 +8,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'MyAppPages/Acceuil.dart';
 
 void main() async{
@@ -32,12 +31,12 @@ class MyApp extends StatelessWidget {
       initialRoute: _auth.currentUser == null ? Connexion.screenRoute : Acceuil.screenRoute,
       routes: {
         Connexion.screenRoute: (context) => Connexion(),
-        Inscription.screenRoute: (context) => Inscription(),
-        Acceuil.screenRoute: (context) => Acceuil(),
-        MesGroupes.screenRoute: (context) => MesGroupes(),
-        MesInvitations.screenRoute: (context) => MesInvitations(),
-        MonProfile.screenRoute: (context) => MonProfile(),
-        CreerGroupe.screenRoute: (context) => CreerGroupe(),
+        Inscription.screenRoute: (context) => const Inscription(),
+        Acceuil.screenRoute: (context) => const Acceuil(),
+        MesGroupes.screenRoute: (context) => const MesGroupes(),
+        MesInvitations.screenRoute: (context) => const MesInvitations(),
+        MonProfile.screenRoute: (context) => const MonProfile(),
+        CreerGroupe.screenRoute: (context) => const CreerGroupe(),
       },
     );
   }

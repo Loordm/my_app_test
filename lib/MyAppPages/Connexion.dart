@@ -34,10 +34,10 @@ class _ConnexionState extends State<Connexion> {
                 height: screenHeight*0.2,
               ),
             ),
-            Text(
+            const Text(
                 'Connexion',
                 style: TextStyle(
-                  fontSize: screenWidth/20,
+                  fontSize: 30,
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.bold
                 ),
@@ -63,12 +63,12 @@ class _ConnexionState extends State<Connexion> {
                       ),
                       labelText: 'Email',
                       labelStyle: TextStyle(
-                        fontSize: 10
+                        fontSize: screenWidth/28
                       ),
                       hintText:
                       'Entrez votre email',
                       hintStyle: TextStyle(
-                          color: Colors.grey[700], fontSize: 10),
+                          color: Colors.grey[700], fontSize: screenWidth/28),
                       fillColor: Colors.grey.shade100,
                       filled: true,
                     ),
@@ -105,12 +105,12 @@ class _ConnexionState extends State<Connexion> {
                       ),
                       labelText: 'Mot de passe',
                       labelStyle: TextStyle(
-                        fontSize: 10
+                        fontSize: screenWidth/28
                       ),
                       hintText:
                       'Entrez votre mot de passe',
                       hintStyle: TextStyle(
-                          color: Colors.grey[700], fontSize: 10),
+                          color: Colors.grey[700], fontSize: screenWidth/28),
                       fillColor: Colors.grey.shade100,
                       filled: true,
                     ),
@@ -157,7 +157,7 @@ class _ConnexionState extends State<Connexion> {
                           'Connecter',
                           style: TextStyle(
                             fontFamily: 'Poppins',
-                            fontSize: 14,
+                            fontSize: screenWidth/20,
                           ),
                         ),
                     ),
@@ -172,7 +172,7 @@ class _ConnexionState extends State<Connexion> {
                           text: 'Vous n\'avez encore un compte? ',
                           style: TextStyle(
                             fontWeight: FontWeight.normal,
-                            fontSize: 10,
+                            fontSize: screenWidth/30,
                             fontFamily: 'Poppins',
                             color: Colors.black,
                           ),
@@ -181,7 +181,7 @@ class _ConnexionState extends State<Connexion> {
                               text: 'Inscrivez-Vous',
                               style: TextStyle(
                                 fontWeight: FontWeight.normal,
-                                fontSize: 10,
+                                fontSize: screenWidth/30,
                                 fontFamily: 'Poppins',
                                 color: Colors.blue,
                                 decoration: TextDecoration.underline,

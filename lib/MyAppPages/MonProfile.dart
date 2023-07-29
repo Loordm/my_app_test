@@ -42,12 +42,12 @@ class _MonProfileState extends State<MonProfile> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Align(
+        title: const Align(
           alignment: Alignment.center,
           child: Text(
             'Mon profil',
             style: TextStyle(
-                fontSize: 30,
+                fontSize: 26,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
                 fontFamily: 'Poppins'),
@@ -62,7 +62,7 @@ class _MonProfileState extends State<MonProfile> {
                 utilisateurCollection.doc(auth.currentUser!.uid).snapshots(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
-                return Text('');
+                return const Text('');
               } else {
                 if (snapshot.data!.exists) {
                   Utilisateur utilisateur = Utilisateur.creerUtilisateurVide();
@@ -79,39 +79,35 @@ class _MonProfileState extends State<MonProfile> {
                       Stack(
                         alignment: Alignment.bottomCenter,
                         children: [
-                          Container(
-                            child: Image.asset(
-                              'assets/rectangle.png',
-                              height: screenHeight * 0.2,
-                              fit: BoxFit.fitWidth,
-                            ),
+                          Image.asset(
+                            'assets/rectangle.png',
+                            height: screenHeight * 0.2,
+                            fit: BoxFit.fitWidth,
                           ),
                           (!isLoading)
-                              ? Container(
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(100),
-                                    child: Image.network(
-                                      '${utilisateur.imageUrl}',
-                                      fit: BoxFit.cover,
-                                      width: screenWidth / 3.8,
-                                      height: screenWidth / 3.8,
-                                    ),
-                                  ),
-                                )
-                              : CircularProgressIndicator(),
+                              ? ClipRRect(
+                                borderRadius: BorderRadius.circular(100),
+                                child: Image.network(
+                                  utilisateur.imageUrl,
+                                  fit: BoxFit.cover,
+                                  width: screenWidth / 3.8,
+                                  height: screenWidth / 3.8,
+                                ),
+                              )
+                              : const CircularProgressIndicator(),
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 4,
                       ),
                       Text(
-                        '${utilisateur.email}',
-                        style: TextStyle(
+                        utilisateur.email,
+                        style: const TextStyle(
                             fontSize: 16,
                             fontFamily: 'Poppins',
                             color: Colors.black),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
                       Row(
@@ -134,9 +130,13 @@ class _MonProfileState extends State<MonProfile> {
                                 setState(() {
                                   isLoading = true;
                                 });
-
                                 /// 2) upload the image in firebase storage
-                                if (file == null) return;
+                                if (file == null){
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                  return;
+                                }
                                 Reference referenceRoot =
                                     FirebaseStorage.instance.ref();
                                 Reference referenceDirImages =
@@ -163,6 +163,9 @@ class _MonProfileState extends State<MonProfile> {
                                   throw Exception(
                                       'Erreur dans le set de l\'image');
                                 }
+                                setState(() {
+                                  isLoading = false;
+                                });
                               },
                               icon: Icon(
                                 Icons.add_a_photo_outlined,
@@ -178,7 +181,7 @@ class _MonProfileState extends State<MonProfile> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              const Text(
                                 'Nom complet',
                                 style: TextStyle(
                                     fontSize: 16,
@@ -186,12 +189,12 @@ class _MonProfileState extends State<MonProfile> {
                                     fontFamily: 'Poppins',
                                     color: Colors.black),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 10,
                               ),
                               TextFormField(
                                 controller: _contrNomComplet,
-                                decoration: InputDecoration(
+                                decoration: const InputDecoration(
                                   border: OutlineInputBorder(
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(12)),
@@ -222,10 +225,10 @@ class _MonProfileState extends State<MonProfile> {
                                   _changementNomComplet = true;
                                 },
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 26,
                               ),
-                              Text(
+                              const Text(
                                 'Numéro du téléphone',
                                 style: TextStyle(
                                     fontSize: 16,
@@ -233,12 +236,12 @@ class _MonProfileState extends State<MonProfile> {
                                     fontFamily: 'Poppins',
                                     color: Colors.black),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 10,
                               ),
                               TextFormField(
                                 controller: _contrNumeroDuTelephone,
-                                decoration: InputDecoration(
+                                decoration: const InputDecoration(
                                   border: OutlineInputBorder(
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(12)),
@@ -273,13 +276,12 @@ class _MonProfileState extends State<MonProfile> {
                           ),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       ),
                       Container(
                         width: screenWidth,
                         padding: const EdgeInsets.fromLTRB(24, 8, 24, 8),
-                        height: 64,
                         child: ElevatedButton(
                           onPressed: () async {
                             if (_changementNomComplet) {
@@ -299,13 +301,6 @@ class _MonProfileState extends State<MonProfile> {
                               );
                             }
                           },
-                          child: Text(
-                            'Valider les modifications',
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 15,
-                            ),
-                          ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.indigoAccent[400],
                             shape: RoundedRectangleBorder(
@@ -313,11 +308,19 @@ class _MonProfileState extends State<MonProfile> {
                                   24), // Border radius of the button
                             ),
                           ),
+                          child: const Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: Text(
+                              'Valider les modifications',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                      SizedBox(
-                        height: screenHeight / 26,
-                      ),
+                      const SizedBox(height: 10,),
                       Align(
                         alignment: Alignment.bottomCenter,
                         child: TextButton(
@@ -326,7 +329,7 @@ class _MonProfileState extends State<MonProfile> {
                             Navigator.pushNamedAndRemoveUntil(context,
                                 Connexion.screenRoute, (route) => false);
                           },
-                          child: Text(
+                          child: const Text(
                             'Déconnexion',
                             style: TextStyle(
                                 fontSize: 16,
@@ -338,7 +341,9 @@ class _MonProfileState extends State<MonProfile> {
                     ],
                   );
                 }
-                else return SizedBox(height: 0,width: 0,);
+                else {
+                  return const SizedBox(height: 0,width: 0,);
+                }
               }
             },
           ),

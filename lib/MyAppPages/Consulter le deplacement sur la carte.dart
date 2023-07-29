@@ -48,57 +48,6 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
   String newSnippetOwner = '';
   String newSnippetMember = '';
   bool _trajetEstLancee = false ;
-
-  /*Future<Uint8List> getBytesFromAsset(String path, int width) async {
-    ByteData data = await rootBundle.load(path);
-    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
-        targetWidth: width);
-    ui.FrameInfo fi = await codec.getNextFrame();
-    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
-        .buffer
-        .asUint8List();
-  }
-
-  Future<void> setCustomMarker() async {
-    BitmapDescriptor.fromAssetImage(
-            ImageConfiguration.empty, "assets/images/current_location.png")
-        .then((icon) => locationMarker = icon);
-  }
-
-  Future<void> addMarker() async {
-    await getBytesFromAsset("assets/images/current_location.png", 120)
-        .then((value) {
-      if (mounted) {
-        setState(() {
-          markers.add(Marker(
-            markerId: const MarkerId("cuurent_pos"),
-            position:
-                LatLng(current_location!.latitude, current_location!.longitude),
-            icon: BitmapDescriptor.fromBytes(value),
-          ));
-        });
-      }
-    });
-  }
-
-  Future<void> addUserMarkers(Utilisateur utilisateur) async {
-    if (utilisateur.identifiant != auth.currentUser!.uid) {
-      Uint8List imageData = await getBytesFromAsset(
-          utilisateur.imageUrl, 120); // Adjust the width as needed
-      BitmapDescriptor userMarkerIcon = BitmapDescriptor.fromBytes(imageData);
-      markers.add(Marker(
-        markerId: MarkerId(utilisateur.identifiant),
-        position: utilisateur.positionActuel,
-        icon: userMarkerIcon,
-      ));
-
-      // Update the state to reflect the changes
-      if (mounted) {
-        setState(() {});
-      }
-    }
-  }*/
-
   Future<Uint8List> getBytesFromAsset(String path, int width) async {
     ByteData data = await rootBundle.load(path);
     ui.Codec codec = await ui.instantiateImageCodec(
@@ -333,6 +282,7 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
           child: Text(
             'Déplacement sur la carte',
             style: TextStyle(
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
                 fontFamily: 'Poppins'),
@@ -343,7 +293,7 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
               icon: Icon(
                 Icons.arrow_back,
                 color: Colors.transparent,
-                size: screenWidth / 10,
+                size: 36,
               ),
               onPressed: null),
         ],
@@ -351,7 +301,7 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
           icon: Icon(
             Icons.arrow_back,
             color: Colors.white,
-            size: screenWidth / 10,
+            size: 36,
           ),
           onPressed: () {
             Navigator.pop(context);
@@ -397,18 +347,12 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
                               ['secondaryText']);
                       // get le proprietaire du groupe
                       idOwner = snapshot.data!['idOwner'];
-                      print('************************************');
-                      print('idOwner = $idOwner');
-                      print('************************************');
                       // get les membres du groupe
                       Map<String, dynamic> membresData = snapshot.data!.data() as Map<String, dynamic>;
                       if (membresData.isNotEmpty){
                         listIdUsers = List<String>.from(membresData['membres']);
                       }
                       listIdUsers.add(idOwner); // to find it in the condition
-                      print('************************************');
-                      print('listIdUsers = $listIdUsers');
-                      print('************************************');
                       // le 2eme StreamBuilder pour get les utilisateurs qui appartient au ce groupe par les id precedentes
                       return StreamBuilder<QuerySnapshot>(
                         stream: utilisateurCollection.snapshots(),
@@ -442,19 +386,7 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
                                     if (_trajetEstLancee){
                                        getUserPlace(owner.positionActuel,newSnippetOwner);
                                        modifierMarker(owner.imageUrl, owner.nomComplet, newSnippetOwner, owner.positionActuel);
-                                       print(
-                                           '************************************');
-                                       print(
-                                           'marker has been modified for ${owner.email}');
-                                       print(
-                                           '************************************');
                                     }
-                                    print(
-                                        '************************************');
-                                    print(
-                                        'owner info : ${owner.identifiant}, ${owner.email}');
-                                    print(
-                                        '************************************');
                                   } else if (utilisateur.identifiant !=
                                           idOwner &&
                                       listIdUsers
@@ -465,21 +397,7 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
                                     if (_trajetEstLancee){
                                       getUserPlace(utilisateur.positionActuel,newSnippetMember);
                                       modifierMarker(utilisateur.imageUrl, utilisateur.nomComplet, newSnippetMember, utilisateur.positionActuel);
-                                      print(
-                                          '************************************');
-                                      print(
-                                          'marker has been modified for ${utilisateur.email}');
-                                      print(
-                                          '************************************');
                                     }
-                                  }
-                                  for (Utilisateur s in resteUsers) {
-                                    print(
-                                        '************************************');
-                                    print(
-                                        'membre info : ${s.identifiant}, ${s.email}');
-                                    print(
-                                        '************************************');
                                   }
                                 }
                               }
@@ -515,7 +433,7 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
             style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.indigoAccent[400],
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24))),
+                    borderRadius: BorderRadius.circular(60))),
             onPressed: () async {
               setState(() {
                 _isLoading = true;
@@ -533,10 +451,6 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
                     description: '',
                     mainText: '',
                     secondaryText: '');
-                print('****************************************');
-                print(
-                    'LatLng Owner : ${latLngPositionActuelOwner.latitude},${latLngPositionActuelOwner.longitude}');
-                print('****************************************');
                 lieuActuel = await getPlaceFromLatLng(
                     latLngPositionActuelOwner.latitude,
                     latLngPositionActuelOwner.longitude);
@@ -548,9 +462,6 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
               }
 
               /// 2) set makers to the membres
-              print('*********************');
-              print('im here=====');
-              print('*********************');
               for (Utilisateur utilisateur in resteUsers) {
                 if (utilisateur.identifiant != auth.currentUser!.uid) {
                   String placeActuel = '';
