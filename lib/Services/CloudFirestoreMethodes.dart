@@ -2,6 +2,7 @@ import 'package:app_test/MyAppClasses/Groupe.dart';
 import 'package:app_test/MyAppClasses/Invitation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:places_service/places_service.dart';
 import '../MyAppClasses/Utilisateur.dart';
 
 class CloudFirestoreMethodes {
@@ -108,13 +109,21 @@ class CloudFirestoreMethodes {
     DocumentReference groupeRef = _utilisateurCollection.doc(uid).collection('Groupes').doc(idGroupe);
     groupeRef.delete();
   }
-  Future<void> supprimerUtilisateurAuGroupe(String uidUser, String uidGroupe, int index) async {
-    DocumentReference groupeDocRef = _utilisateurCollection.doc(uidUser).collection('Groupes').doc(uidGroupe);
+  Future<void> supprimerUtilisateurAuGroupe(String uidOwner, String uidGroupe, String uidUserToDelete) async {
+    int index = 0 ;
+    DocumentReference groupeDocRef = _utilisateurCollection.doc(uidOwner).collection('Groupes').doc(uidGroupe);
     await groupeDocRef.get().then((snapshot) {
       if (snapshot.exists) {
         Map<String, dynamic> membresData =
         snapshot.data() as Map<String, dynamic>;
         var listMembres = List<String>.from(membresData['membres']);
+        for (String id in listMembres){
+          if (id == uidUserToDelete) {
+            break ;
+          }else {
+            index ++ ;
+          }
+        }
         if (index >= 0 && index < listMembres.length) {
           listMembres.removeAt(index);
           groupeDocRef.update({'membres': listMembres});
@@ -131,16 +140,31 @@ class CloudFirestoreMethodes {
     final position = GeoPoint(positionActuel.latitude, positionActuel.longitude);
     await utilisateurDocRef.update({'positionActuel': position});
   }
-  Future<void> modifierNomComplet(String uid, String nomComplet) async {
+  Future<void> modifierNomCompletEtNumero(String uid, String nomComplet, String numeroDeTephone) async {
     DocumentReference utilisateurDocRef = _utilisateurCollection.doc(uid);
     await utilisateurDocRef.update({'nomComplet': nomComplet});
-  }
-  Future<void> modifierNumeroDeTelephone(String uid, String numeroDeTephone) async {
-    DocumentReference utilisateurDocRef = _utilisateurCollection.doc(uid);
     await utilisateurDocRef.update({'numeroDeTelephone': numeroDeTephone});
+
   }
   Future<void> modifierImage(String uid, String imageUrl) async {
     DocumentReference utilisateurDocRef = _utilisateurCollection.doc(uid);
     await utilisateurDocRef.update({'imageUrl': imageUrl});
+  }
+  Map<String, dynamic> _convertPlaceResultToMap(PlacesAutoCompleteResult place) {
+    return {
+      'placeId': place.placeId,
+      'description': place.description,
+      'secondaryText': place.secondaryText,
+      'mainText': place.mainText,
+    };
+  }
+  Future<void> modifierDestination(String uid, String idGroupe, PlacesAutoCompleteResult newDestination) async {
+    DocumentReference groupeDocRef = _utilisateurCollection.doc(uid).collection('Groupes').doc(idGroupe);
+    Map<String, dynamic> destinationMap = _convertPlaceResultToMap(newDestination);
+    await groupeDocRef.update({'lieuArrivee': destinationMap});
+  }
+  Future<void> modifierDateDepart(String uid, String idGroupe, DateTime newDateTime) async {
+    DocumentReference groupeDocRef = _utilisateurCollection.doc(uid).collection('Groupes').doc(idGroupe);
+    await groupeDocRef.update({'dateDepart': newDateTime});
   }
 }

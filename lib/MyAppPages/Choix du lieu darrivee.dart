@@ -1,7 +1,11 @@
+import 'package:app_test/Services/CloudFirestoreMethodes.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:places_service/places_service.dart';
 class ChoixLieuArrivee extends StatefulWidget {
-
+  bool modifier_ou_creer ; // si true modifier, si false creer
+  String idGroupe ;
+  ChoixLieuArrivee({required this.modifier_ou_creer,required this.idGroupe});
   @override
   State<ChoixLieuArrivee> createState() => _ChoixLieuArriveeState();
 }
@@ -140,9 +144,26 @@ class _ChoixLieuArriveeState extends State<ChoixLieuArrivee> {
         ),
       ),
       actions: <Widget>[
-        TextButton(onPressed: (){
+        TextButton(
+          onPressed: ()async{
           if (lieuArrivee != null) {
-            Navigator.pop(context,lieuArrivee);
+            if (widget.modifier_ou_creer){ // si il va la modifier la destination
+              await CloudFirestoreMethodes().modifierDestination(FirebaseAuth.instance.currentUser!.uid,widget.idGroupe,lieuArrivee!);
+              Navigator.pop(context);
+              ScaffoldMessenger.of(
+                  context)
+                  .showSnackBar(
+                const SnackBar(
+                    duration: Duration(
+                        seconds:
+                        2),
+                    content:
+                    Text('Modification avec succées')),
+              );
+            }
+            else { // si il est dans creer un groupe
+              Navigator.pop(context,lieuArrivee);
+            }
           }else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -152,7 +173,8 @@ class _ChoixLieuArriveeState extends State<ChoixLieuArrivee> {
             );
           }
         },
-            child: const Text('Ok')),
+            child: (widget.modifier_ou_creer) ? const Text('Modifier') : const Text('Ok') ,
+        ) ,
         TextButton(onPressed: () => Navigator.pop(context)
             , child: const Text('Annuler'))
       ],

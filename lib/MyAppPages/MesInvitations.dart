@@ -108,10 +108,6 @@ class _MesInvitationsState extends State<MesInvitations> {
                               if (!snapshot.hasData) {
                                 return const Center();
                               }
-                              else if (snapshot.connectionState == ConnectionState.waiting) {
-                                // While data is loading
-                                return const CircularProgressIndicator();
-                              }
                               else if (snapshot.hasError) {
                                 // Handle the error
                                 return Text('Error: ${snapshot.error}');
@@ -155,69 +151,67 @@ class _MesInvitationsState extends State<MesInvitations> {
                                         Padding(
                                           padding: const EdgeInsets.fromLTRB(
                                               8, 0, 0, 0),
-                                          child: SingleChildScrollView(
-                                            scrollDirection: Axis.horizontal,
-                                            child: SizedBox(
-                                              width: screenWidth,
-                                              child: Row(
-                                                children: [
-                                                  Align(
-                                                    alignment: Alignment.topLeft,
-                                                    child: ClipRRect(
-                                                      borderRadius: BorderRadius
-                                                          .circular(100),
-                                                      child: Image.network(
-                                                        utilisateur.imageUrl,
-                                                        fit: BoxFit.cover,
-                                                        width: screenWidth / 7,
-                                                        height: screenWidth / 7,
+                                          child: SizedBox(
+                                            width: screenWidth,
+                                            child: Row(
+                                              children: [
+                                                Align(
+                                                  alignment: Alignment.topLeft,
+                                                  child: ClipRRect(
+                                                    borderRadius: BorderRadius
+                                                        .circular(100),
+                                                    child: Image.network(
+                                                      utilisateur.imageUrl,
+                                                      fit: BoxFit.cover,
+                                                      width: screenWidth / 7,
+                                                      height: screenWidth / 7,
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(width: 8,),
+                                                Expanded(
+                                                  child: Column(
+                                                    mainAxisAlignment: MainAxisAlignment.start,
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        '${utilisateur
+                                                            .nomComplet}',
+                                                        style: const TextStyle(
+                                                          fontSize: 16,
+                                                          fontFamily: 'Poppins',
+                                                          fontWeight: FontWeight
+                                                              .w300,
+                                                          color: Colors.black,
+                                                        ),
                                                       ),
-                                                    ),
+                                                      SelectableText(
+                                                        '${utilisateur
+                                                            .numeroDeTelephone}',
+                                                        style: TextStyle(
+                                                          fontSize: 15,
+                                                          fontFamily: 'Poppins',
+                                                          fontWeight: FontWeight
+                                                              .w300,
+                                                          color: Colors
+                                                              .indigoAccent[400],
+                                                        ),
+                                                      ),
+                                                      SelectableText(
+                                                        '${utilisateur.email}',
+                                                        style: TextStyle(
+                                                          fontSize: 15,
+                                                          fontFamily: 'Poppins',
+                                                          fontWeight: FontWeight
+                                                              .w300,
+                                                          color: Colors
+                                                              .indigoAccent[400],
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                  Expanded(
-                                                    child: Column(
-                                                      mainAxisAlignment: MainAxisAlignment.start,
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children: [
-                                                        Text(
-                                                          '  ${utilisateur
-                                                              .nomComplet}',
-                                                          style: const TextStyle(
-                                                            fontSize: 16,
-                                                            fontFamily: 'Poppins',
-                                                            fontWeight: FontWeight
-                                                                .w300,
-                                                            color: Colors.black,
-                                                          ),
-                                                        ),
-                                                        SelectableText(
-                                                          '  ${utilisateur
-                                                              .numeroDeTelephone}    ',
-                                                          style: TextStyle(
-                                                            fontSize: 15,
-                                                            fontFamily: 'Poppins',
-                                                            fontWeight: FontWeight
-                                                                .w300,
-                                                            color: Colors
-                                                                .indigoAccent[400],
-                                                          ),
-                                                        ),
-                                                        SelectableText(
-                                                          '  ${utilisateur.email}',
-                                                          style: TextStyle(
-                                                            fontSize: 15,
-                                                            fontFamily: 'Poppins',
-                                                            fontWeight: FontWeight
-                                                                .w300,
-                                                            color: Colors
-                                                                .indigoAccent[400],
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ),
@@ -284,7 +278,6 @@ class _MesInvitationsState extends State<MesInvitations> {
                                                         await _cloudFirestore.modifierInvitation(auth.currentUser!.uid, index, true);
                                                         await _cloudFirestore.ajouterGroupe(auth.currentUser!.uid, groupe,invitation.idGroupe);
                                                         await _cloudFirestore.ajouterUtilisateurAuGroupe(groupe.idOwner, invitation.idGroupe, auth.currentUser!.uid);
-                                                        /// ajouter cet utilisateur a toutes les membres du groupe du owner
                                                       },
                                                       child: SizedBox(
                                                         width: screenWidth,
@@ -454,11 +447,12 @@ class _MesInvitationsState extends State<MesInvitations> {
                       },
                     );
                   },
-                ) : const Center(
-                  child: Text(
-                    textAlign: TextAlign.center,
-                    'Vous n\'avez aucune invitation pour le moment',
-                    style: TextStyle(
+                )
+                    : const Center(
+                     child: Text(
+                      textAlign: TextAlign.center,
+                      'Vous n\'avez aucune invitation pour le moment',
+                      style: TextStyle(
                         color: Colors.black,
                         fontFamily: 'Poppins',
                         fontSize: 16),

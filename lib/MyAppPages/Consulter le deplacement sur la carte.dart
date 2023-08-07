@@ -129,7 +129,6 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
   void modifierMarker(
       String markerIdToModify,
       String newTitle,
-      String newSnippet,
       LatLng newPosition,
       ) {
     Set<Marker> markersCopy = markers.toSet();
@@ -142,7 +141,7 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
           icon: marker.icon,
           infoWindow: InfoWindow(
             title: '                $newTitle                ',
-            snippet: newSnippet,
+            snippet: marker.infoWindow.snippet,
           ),
         );
         markers.add(modifiedMarker);
@@ -150,10 +149,6 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
       }
     }
   }
-
-
-
-
 
   void setPolylines(LatLng depart, LatLng arrive) async {
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
@@ -288,7 +283,7 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
                 fontFamily: 'Poppins'),
           ),
         ),
-        actions: [
+        actions: const [
           IconButton(
               icon: Icon(
                 Icons.arrow_back,
@@ -298,7 +293,7 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
               onPressed: null),
         ],
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back,
             color: Colors.white,
             size: 36,
@@ -384,8 +379,7 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
                                     owner = Utilisateur.creerUtilisateurVide();
                                     owner = utilisateur;
                                     if (_trajetEstLancee){
-                                       getUserPlace(owner.positionActuel,newSnippetOwner);
-                                       modifierMarker(owner.imageUrl, owner.nomComplet, newSnippetOwner, owner.positionActuel);
+                                       modifierMarker(owner.imageUrl, owner.nomComplet, owner.positionActuel);
                                     }
                                   } else if (utilisateur.identifiant !=
                                           idOwner &&
@@ -395,8 +389,7 @@ class _DeplacementSurLaCarteState extends State<DeplacementSurLaCarte> {
                                     // et il faut qu'il fait partie du groupe
                                     resteUsers.add(utilisateur);
                                     if (_trajetEstLancee){
-                                      getUserPlace(utilisateur.positionActuel,newSnippetMember);
-                                      modifierMarker(utilisateur.imageUrl, utilisateur.nomComplet, newSnippetMember, utilisateur.positionActuel);
+                                      modifierMarker(utilisateur.imageUrl, utilisateur.nomComplet, utilisateur.positionActuel);
                                     }
                                   }
                                 }

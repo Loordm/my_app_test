@@ -27,7 +27,6 @@ class _MonProfileState extends State<MonProfile> {
   final _contrNomComplet = TextEditingController();
   final _contrNumeroDuTelephone = TextEditingController();
   bool _changementNomComplet = false;
-
   bool _changementNumero = false;
 
   bool isLoading = false;
@@ -284,14 +283,9 @@ class _MonProfileState extends State<MonProfile> {
                         padding: const EdgeInsets.fromLTRB(24, 8, 24, 8),
                         child: ElevatedButton(
                           onPressed: () async {
-                            if (_changementNomComplet) {
-                              await _cloudFirestore.modifierNomComplet(
-                                  auth.currentUser!.uid, _contrNomComplet.text);
-                            }
-                            if (_changementNumero) {
-                              await _cloudFirestore.modifierNumeroDeTelephone(
-                                  auth.currentUser!.uid,
-                                  _contrNumeroDuTelephone.text);
+                            if (_changementNomComplet || _changementNumero) {
+                              await _cloudFirestore.modifierNomCompletEtNumero(
+                                  auth.currentUser!.uid, _contrNomComplet.text,_contrNumeroDuTelephone.text);
                             }
                             if (_changementNumero || _changementNomComplet) {
                               ScaffoldMessenger.of(context).showSnackBar(

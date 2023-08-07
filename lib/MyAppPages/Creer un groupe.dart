@@ -25,7 +25,6 @@ class _CreerGroupeState extends State<CreerGroupe> {
       FirebaseFirestore.instance.collection('Utilisateur');
   final FirebaseAuth auth = FirebaseAuth.instance;
   bool isLoading = false;
-
   DateTime dateDepart = DateTime.now();
   DateTime? _selectedDate;
   int indexEmail = 0;
@@ -120,7 +119,7 @@ class _CreerGroupeState extends State<CreerGroupe> {
                       context: context,
                       barrierDismissible: false,
                       builder: (context) {
-                        return ChoixLieuArrivee();
+                        return ChoixLieuArrivee(modifier_ou_creer: false,idGroupe: '');
                       },
                     );
                     if (lieuArrivee != null) {

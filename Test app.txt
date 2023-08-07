@@ -1,0 +1,113 @@
+App yodkhol fiha user w yecreer groupe wela ydir join l groupe, w groupe fih : useres, date de depart et 
+lieu d'arrivee.
+
+==========================================================================================================
+******************************************* Logique du travail ******************************************
+class Utilisateur{
+  String _identifiant ;
+  String _nomComplet ;
+  String _email ;
+  String _numeroDeTelephone ;
+  String _imageUrl = 'https://imgv3.fotor.com/images/blog-richtext-image/10-profile-picture-ideas-to-make-you-stand-out.jpg' ;
+  LatLng _positionActuel ;
+  List<Groupe> _groupes ;
+  List<Invitation> _invitations ;
+}
+class Groupe {
+  String _idGroupe = '' ; // parceque Groupe est une subcollection pour Utilisateur
+  PlacesAutoCompleteResult _lieuArrivee ;
+  DateTime _dateDepart ;
+  String _idOwner ;
+  String _idGroupeOwner ;
+  List<String> _membres ;
+}
+class Invitation {
+  String _idEnvoyeur ;
+  String _idRecepteur ;
+  String _idGroupe ;
+  bool _acceptation ;
+  bool _dejaTraite ; 
+}
+- Chaque utilisateur a ses propriétés et une liste des groupes, chaque groupe a un id (parceque Groupe est
+ une subcollection pour Utilisateur) et idOwner parceque quand l'utilisateur creer un groupe, donc il 
+ devient l'owner, donc on doit stocker leur id dans le groupe, et meme quand il creer un groupe, le groupe
+ va "have" un id, donc on doit stocker idGroupeOwner pour acceder au informations du groupe par le groupe
+ de owner, parceque il est le seul qui peut modifier ce groupe. et pour rejoindre un groupe il faut que le
+ owner envoi une invitation pour le memebre et puis le membre va accepter ou refuser, si il accepte alors
+ son id va etre ajoutee dans la liste des membres du groupe du proprietaire, et elle va creer un groupe a ce
+ membre avec idOwner et IdGroupeOwner, (parceque toutes les membres va voir les info du groupe a travers le
+ groupe du owner).
+/// Normalement Groupe est une classe abstraite, et elle doit etre
+/**  
+  abstract class Groupe {
+      String _idGroupe ;
+    }
+et elle doit etre existe deux groupes herite du classe Groupe :
+    class GroupeOwner extends Groupe {
+      PlacesAutoCompleteResult _lieuArrivee ;
+      DateTime _dateDepart ;
+      List<String> _membres ;
+    }
+    class GroupeMembre extends Groupe {
+      String _idOwner ;
+      String _idGroupeOwner ;
+    }
+  **/
+==========================================================================================================
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+*********** Pages *************
+1) Page fiha singUp w singIn :
+  - Page de SignUp.
+  - Page de LogIn.
+2) Page fiha les titres : Creer un groupe, mes groupes, join un groupe et mon profile.
+  - Page pour consulter mes groupes.
+  - Page pour creer un groupe.
+  - Page pour join un groupe.
+  - Page de mon profile.
+3) Si il click sur consulter mes groupes : ida Oui lel Q2 tsema ji Page fiha Cards fiha : lieu d'arrivee, 
+   les noms des partenaires w ki y3abaz 3liha tedih lel page 4 , w ida Non tsema tji directement la Page 4
+4) Si howa li creea l groupe rah jih Page fiha : manager le groupe, consulter le deplacement sur la carte
+   sinon ida hwa dar join l hadak l groupe, ra7 jih page fiha : consulter les membres du groupe, consulter
+   le deplacement sur la carte.
+5) Page manager le groupe : fiha les info ta3 ga3 les users li rahom m3ak w bouton pour appeler un partenaire
+   , w fiha les options : supprimer un user, annuler ce groupe et ajouter un partenaire.
+6) Page consulter les membres du groupe : kima la page manager le groupe, mais les options li fiha homa
+   juste sortir de ce groupe.
+***********
+7) Page consulter le deplacement sur la carte : ## Hia Sa7 ##  
+Si la date de depart == date aujoudhuit alors ji page fiha MapView, w fiha kol user mpointi 3la position
+ta3o, w a chaque fois wa7ed ydiplacer tet7arak m3ah la marke ta3o, la marke yji fiha photo ta3o, w fiha mark
+3la lieu d'arrivee.
+Sinon yji dialog beli le trajet mazal ma bdach.
+***********
+8) Page pour creer un groupe, fiha Ajouter la date de depart, ajouter le lieu d'arrivee et ajouter les
+  partenaires.
+9) Page de jointure d'un groupe, fiha listes des cards, chaque card fiha les info du proprietaire du groupe,
+  w message "Nom du proprietaire a envoier pour joindre ce groupe de trajet a Destination" w fiha 2 boutons
+  accepter ou refuser.
+10) Page de profile fiha full name, numéro de telephone et photo de profile, et il peut les modifier.
+*******************************
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+*********** Classes *************
+
+1) class Utilisateur : id, nom, email, numeroTelephone, currentPosition, 
+2) class Groupe :
+
+
+https://www.figma.com/file/jF8AdTZIf5k4CuiSLNdgZ6/My-app-test?type=design&node-id=16-21&mode=design&t=eF8aTIcCEsCWM9ie-0
+
+/**************************************************************************************\
+- Page Connexion : cbn##.
+- Page Inscription : cbn##.
+- Page Profile : cbn##.
+- Page MesInvitations : cbn##.
+- Page MesGroupes : Mazal?? (positionnement des textes + si user a suuprimer le groupe donc il sera supprimee
+ dans toutes les membres + si user a quitter le groupe donc il sera supprimer a toutes les membres et meme
+ le owner).
+- Page Créer groupe : cbn##.
+- Page InfoGroupe : Mazal?? (pour le propriétaire : ajouter modifier la déstination + modifier la date de
+  départ).
+- Page ConsulterMembres : Mazal?? (refaire le logique de recuperation des utilisateurs, il faut recuperer
+  toutes les id de toutes les utilisateurs d'apres le groupeId, et recuperer chaque utilisateur chaqun
+  + supprimer le groupe + inviter un membre + quitter le groupe).
+- Page DeplacementSurCarte : Normalement cbn# (mazal test).  

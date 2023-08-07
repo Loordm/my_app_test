@@ -1,9 +1,12 @@
 import 'package:app_test/MyAppPages/Consulter%20le%20deplacement%20sur%20la%20carte.dart';
 import 'package:app_test/MyAppPages/Les%20membre.dart';
+import 'package:app_test/Services/CloudFirestoreMethodes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:places_service/places_service.dart';
+
+import 'Choix du lieu darrivee.dart';
 
 class InfoGroupe extends StatefulWidget {
   String idGroupe;
@@ -24,7 +27,24 @@ class _InfoGroupeState extends State<InfoGroupe> {
   FirebaseFirestore.instance.collection('Utilisateur');
   final FirebaseAuth auth = FirebaseAuth.instance;
   List<String> listIdUsers = [];
+  DateTime dateDepart = DateTime.now();
+  DateTime? _selectedDate;
 
+  Future<void> _selectDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+        dateDepart = DateTime(picked.year, picked.month, picked.day,
+            DateTime.now().hour, DateTime.now().minute);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,24 +102,9 @@ class _InfoGroupeState extends State<InfoGroupe> {
                   case MenuValues.ModifierDestination:
                     showDialog(
                       context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text('Modifier la déstination'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text('Modifier'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text('Annuler'),
-                            ),
-                          ],
-                        );
+                      barrierDismissible: false,
+                      builder: (context) {
+                        return ChoixLieuArrivee(modifier_ou_creer: true,idGroupe: widget.idGroupe);
                       },
                     );
                     break;
@@ -109,10 +114,65 @@ class _InfoGroupeState extends State<InfoGroupe> {
                       builder: (BuildContext context) {
                         return AlertDialog(
                           title: const Text('Modifier la date de départ'),
+                          content: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              IconButton(
+                                onPressed: _selectDate,
+                                icon: const Icon(Icons.calendar_today),
+                              ),
+                              GestureDetector(
+                                onTap: _selectDate,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      border: Border.all(
+                                        color: Colors.black54,
+                                      ),
+                                      borderRadius: BorderRadius.circular(12)),
+                                  child: (_selectedDate != null)
+                                      ? Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      _selectedDate!.toString().split(" ")[0],
+                                      style: const TextStyle(
+                                          fontFamily: 'Poppins',
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w100,
+                                          color: Colors.black54),
+                                    ),
+                                  )
+                                      : Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      '${DateTime.now().day}-${DateTime.now().month}-${DateTime.now().year}',
+                                      style: const TextStyle(
+                                          fontFamily: 'Poppins',
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w100,
+                                          color: Colors.black54),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                           actions: [
                             TextButton(
-                              onPressed: () {
+                              onPressed: () async{
+                                await CloudFirestoreMethodes().modifierDateDepart(auth.currentUser!.uid,widget.idGroupe,dateDepart);
                                 Navigator.of(context).pop();
+                                ScaffoldMessenger.of(
+                                    context)
+                                    .showSnackBar(
+                                  const SnackBar(
+                                      duration: Duration(
+                                          seconds:
+                                          2),
+                                      content:
+                                      Text('Modification avec succées')),
+                                );
                               },
                               child: const Text('Modifier'),
                             ),

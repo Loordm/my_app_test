@@ -309,6 +309,7 @@ class _MesGroupesState extends State<MesGroupes> {
                                                                             Text('Suppression du groupe avec succées')),
                                                                       );
                                                                     } else {
+                                                                      await CloudFirestoreMethodes().supprimerUtilisateurAuGroupe(groupe.idOwner, groupe.idGroupeOwner, auth.currentUser!.uid);
                                                                       ScaffoldMessenger.of(
                                                                           context)
                                                                           .showSnackBar(
@@ -385,6 +386,9 @@ class _MesGroupesState extends State<MesGroupes> {
                                     }
                                   }
                                   else {
+                                    CloudFirestoreMethodes().supprimerGroupe(
+                                        auth.currentUser!.uid,
+                                        currentUserIdGroupe);
                                     return const SizedBox(
                                       height: 0,
                                       width: 0,

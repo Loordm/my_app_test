@@ -1,9 +1,11 @@
 import 'package:app_test/MyAppClasses/Groupe.dart';
+import 'package:app_test/MyAppPages/Acceuil.dart';
 import 'package:app_test/Services/CloudFirestoreMethodes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import '../MyAppClasses/Invitation.dart';
 import '../MyAppClasses/Utilisateur.dart';
 
 class ConsulterLesMembres extends StatefulWidget {
@@ -21,7 +23,6 @@ class ConsulterLesMembres extends StatefulWidget {
 }
 
 enum MenuValuesProprietaire {
-  SupprimerGroupe,
   InviterUnMembre,
 }
 
@@ -41,6 +42,7 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
 
   @override
   Widget build(BuildContext context) {
+    final _emailController = TextEditingController();
     final Size screenSize = MediaQuery.of(context).size;
     final double screenWidth = screenSize.width;
     return Scaffold(
@@ -75,50 +77,92 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                   ? PopupMenuButton<MenuValuesProprietaire>(
                       itemBuilder: (BuildContext context) => [
                         const PopupMenuItem<MenuValuesProprietaire>(
-                          value: MenuValuesProprietaire.SupprimerGroupe,
-                          child: Text('Supprimer le groupe'),
-                        ),
-                        const PopupMenuItem<MenuValuesProprietaire>(
                           value: MenuValuesProprietaire.InviterUnMembre,
                           child: Text('Inviter un membre'),
                         ),
                       ],
                       onSelected: (value) {
                         switch (value) {
-                          case MenuValuesProprietaire.SupprimerGroupe:
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: const Text('Supprimer le groupe'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: const Text('Supprimer'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: const Text('Annuler'),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                            break;
                           case MenuValuesProprietaire.InviterUnMembre:
                             showDialog(
                               context: context,
                               builder: (BuildContext context) {
                                 return AlertDialog(
                                   title: const Text('Inviter un membre'),
+                                  content: SingleChildScrollView(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Donnez l’email de votre partenaire',
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              fontFamily: 'Poppins',
+                                              color: Colors.black),
+                                        ),
+                                        TextFormField(
+                                          controller: _emailController,
+                                          keyboardType:
+                                              TextInputType.emailAddress,
+                                          decoration: const InputDecoration(
+                                              hintText: 'Email',
+                                              hintStyle: TextStyle(
+                                                  fontFamily: 'Poppins',
+                                                  fontSize: 14)),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                   actions: [
                                     TextButton(
-                                      onPressed: () {
+                                      onPressed: () async {
+                                        if (_emailController.text.isNotEmpty) {
+                                          QuerySnapshot querySnapshot =
+                                              await utilisateurCollection
+                                                  .where('email',
+                                                      isEqualTo:
+                                                          _emailController.text)
+                                                  .get();
+                                          // email est unique, donc elle retourne un seul utilisateur
+                                          if (querySnapshot.docs.isNotEmpty) {
+                                            for (QueryDocumentSnapshot utilisateurDoc
+                                                in querySnapshot.docs) {
+                                              Map<String, dynamic>
+                                                  dataUtilisateur =
+                                                  utilisateurDoc.data()
+                                                      as Map<String, dynamic>;
+                                              if (dataUtilisateur.isNotEmpty) {
+                                                Invitation invitation =
+                                                    Invitation(
+                                                        idEnvoyeur: auth
+                                                            .currentUser!.uid,
+                                                        idRecepteur:
+                                                            dataUtilisateur[
+                                                                'identifiant'],
+                                                        idGroupe:
+                                                            widget.idGroupe,
+                                                        acceptation: false,
+                                                        dejaTraite: false);
+                                                await _cloudFirestore
+                                                    .envoyerInvitation(
+                                                        invitation.idRecepteur,
+                                                        invitation);
+                                              }
+                                            }
+                                          } // fin si il ya une resultat de recherche
+                                        }
                                         Navigator.of(context).pop();
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                              duration: Duration(seconds: 2),
+                                              content: Text(
+                                                  'L\'invitation a été envoyée avec succès')),
+                                        );
                                       },
                                       child: const Text('Inviter'),
                                     ),
@@ -153,7 +197,19 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                                 actions: [
                                   TextButton(
                                     onPressed: () async {
-                                      Navigator.of(context).pop();
+                                      await _cloudFirestore.supprimerUtilisateurAuGroupe(widget.idOwner, widget.idGroupeOwner, auth.currentUser!.uid);
+                                      await _cloudFirestore.supprimerGroupe(auth.currentUser!.uid, widget.idGroupe);
+                                      ScaffoldMessenger.of(
+                                          context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            duration: Duration(
+                                                seconds:
+                                                2),
+                                            content:
+                                            Text('Vous avez quitté le groupe avec succées')),
+                                      );
+                                      Navigator.pushNamedAndRemoveUntil(context, Acceuil.screenRoute, (route) => false);
                                     },
                                     child: const Text('Quitter'),
                                   ),
@@ -202,46 +258,44 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                   stream: utilisateurCollection.snapshots(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
-                      return const Center(child: Text('Il n\'existe aucun membre'));
+                      return const Center(
+                          child: Text('Il n\'existe aucun membre'));
                     } else {
                       resteUsers.clear();
                       listMembersWidget.clear();
                       final allUsers = snapshot.data!.docs;
-                      int i = 0 ;
+                      int i = 0;
                       for (var u in allUsers) {
                         if (listIdUsers.contains(u['identifiant'])) {
                           if (u.exists) {
                             Utilisateur utilisateur =
-                            Utilisateur.creerUtilisateurVide();
+                                Utilisateur.creerUtilisateurVide();
                             utilisateur.identifiant = u['identifiant'];
                             utilisateur.nomComplet = u['nomComplet'];
                             utilisateur.email = u['email'];
                             utilisateur.numeroDeTelephone =
-                            u['numeroDeTelephone'];
+                                u['numeroDeTelephone'];
                             utilisateur.imageUrl = u['imageUrl'];
                             if (utilisateur.identifiant == idOwner &&
-                                listIdUsers
-                                    .contains(utilisateur.identifiant)) {
+                                listIdUsers.contains(utilisateur.identifiant)) {
                               // si ce utilisateur est le owner
                               // et il faut qu'il fait partie du groupe
                               owner = Utilisateur.creerUtilisateurVide();
                               owner = utilisateur;
-                            } else if (utilisateur.identifiant !=
-                                idOwner &&
-                                listIdUsers
-                                    .contains(utilisateur.identifiant)) {
+                            } else if (utilisateur.identifiant != idOwner &&
+                                listIdUsers.contains(utilisateur.identifiant)) {
                               // si ce utilisateur est un membre
                               // et il faut qu'il fait partie du groupe
                               resteUsers.add(utilisateur);
                               listMembersWidget.add(InfoUserContainer(
+                                  utilisateur.identifiant,
                                   utilisateur.imageUrl,
                                   utilisateur.nomComplet,
                                   utilisateur.email,
                                   utilisateur.numeroDeTelephone,
                                   true,
                                   i,
-                                  groupe.idGroupe)
-                              );
+                                  groupe.idGroupe));
                               i++;
                             }
                           }
@@ -252,74 +306,69 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                           const SizedBox(height: 20),
                           (!widget.estProprietaire)
                               ? Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Padding(
-                                padding: EdgeInsets.fromLTRB(24, 8, 4, 0),
-                                child: Text(
-                                  'Le propriétaire',
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Padding(
+                                      padding: EdgeInsets.fromLTRB(24, 0, 4, 0),
+                                      child: Text(
+                                        'Le propriétaire',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: 'Poppins',
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                    InfoUserContainer(
+                                        owner.identifiant,
+                                        owner.imageUrl,
+                                        owner.nomComplet,
+                                        owner.email,
+                                        owner.numeroDeTelephone,
+                                        false,
+                                        0,
+                                        ''),
+                                  ],
+                                )
+                              : const Text(
+                                  textAlign: TextAlign.center,
+                                  'Vous êtes le propriétaire',
                                   style: TextStyle(
                                       fontSize: 16,
-                                      fontWeight: FontWeight.bold,
                                       fontFamily: 'Poppins',
                                       color: Colors.black),
                                 ),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              InfoUserContainer(
-                                  owner.imageUrl,
-                                  owner.nomComplet,
-                                  owner.email,
-                                  owner.numeroDeTelephone,
-                                  false,
-                                  0,
-                                  ''),
-                            ],
-                          )
-                              : const Text(
-                            textAlign: TextAlign.center,
-                            'Vous êtes le propriétaire',
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontFamily: 'Poppins',
-                                color: Colors.black),
-                          ),
                           const SizedBox(
                             height: 10,
                           ),
                           (resteUsers.isNotEmpty)
                               ? const Padding(
-                            padding: EdgeInsets.fromLTRB(24, 8, 4, 0),
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                'Les membres',
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Poppins',
-                                    color: Colors.black),
-                              ),
-                            ),
-                          )
-                              : Padding(
-                                padding: const EdgeInsets.all(24.0),
-                                child: const Center(
-                            child: Text(
-                                'Aucun membre pour le moment',
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontFamily: 'Poppins',
-                                    color: Colors.black),
-                            ),
-                          ),
-                              ),
-                          const SizedBox(
-                            height: 10,
-                          ),
+                                  padding: EdgeInsets.fromLTRB(24, 0, 4, 0),
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      'Les membres',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'Poppins',
+                                          color: Colors.black),
+                                    ),
+                                  ),
+                                )
+                              : const Padding(
+                                  padding: EdgeInsets.all(24.0),
+                                  child: Center(
+                                    child: Text(
+                                      'Aucun membre pour le moment',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontFamily: 'Poppins',
+                                          color: Colors.black),
+                                    ),
+                                  ),
+                                ),
                           Column(
                             children: listMembersWidget,
                           ),
@@ -342,6 +391,7 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
   }
 
   Widget InfoUserContainer(
+      String id,
       String imageUrl,
       String nomComplet,
       String email,
@@ -379,10 +429,11 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                       ),
                     ),
                   ),
+                  const SizedBox(width: 8,),
                   Expanded(
                     child: Text(
-                      textAlign : TextAlign.left,
-                      '  $nomComplet',
+                      textAlign: TextAlign.left,
+                      (id == auth.currentUser!.uid) ? '$nomComplet  (Vous)' : nomComplet,
                       style: const TextStyle(
                         fontSize: 16,
                         fontFamily: 'Poppins',
@@ -404,17 +455,17 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
               width: screenWidth,
               child: Row(
                 children: [
-                    const Align(
-                      alignment: Alignment.topLeft,
-                      child: Text(
+                  const Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(
                       'Email :      ',
                       style: TextStyle(
                           fontSize: 16,
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.bold,
                           color: Colors.black),
-                       ),
                     ),
+                  ),
                   Expanded(
                     child: SelectableText(
                       textAlign: TextAlign.left,
@@ -478,8 +529,8 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                       context: context,
                       builder: (BuildContext context) {
                         return AlertDialog(
-                          title:
-                              const Text('Voulez vous supprimer cet utilisateur ?'),
+                          title: const Text(
+                              'Voulez vous supprimer cet utilisateur ?'),
                           actions: [
                             TextButton(
                               onPressed: () async {
@@ -487,7 +538,7 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                                     .supprimerUtilisateurAuGroupe(
                                         auth.currentUser!.uid,
                                         widget.idGroupeOwner,
-                                        index);
+                                        id);
                                 Navigator.of(context).pop();
                               },
                               child: const Text('Oui'),
@@ -512,7 +563,9 @@ class _ConsulterLesMembresState extends State<ConsulterLesMembres> {
                   width: 0,
                   height: 0,
                 ),
-          const SizedBox(height: 20,),
+          (!(widget.estProprietaire && ableToDelete)) ?const SizedBox(
+            height: 12,
+          ) : const SizedBox(),
         ],
       ),
     );

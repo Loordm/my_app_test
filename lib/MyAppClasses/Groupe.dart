@@ -1,5 +1,22 @@
 import 'package:places_service/places_service.dart';
 
+/// Normalement Groupe est une classe abstraite, et elle doit etre
+/**
+  abstract class Groupe {
+      String _idGroupe ;
+    }
+et elle doit etre existe deux groupes herite du classe Groupe :
+    class GroupeOwner extends Groupe {
+      PlacesAutoCompleteResult _lieuArrivee ;
+      DateTime _dateDepart ;
+      List<String> _membres ;
+    }
+    class GroupeMembre extends Groupe {
+      String _idOwner ;
+      String _idGroupeOwner ;
+    }
+  **/
+
 class Groupe {
   String _idGroupe = '' ; // parceque Groupe est une subcollection pour Utilisateur
   PlacesAutoCompleteResult _lieuArrivee ;
