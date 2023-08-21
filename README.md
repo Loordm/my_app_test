@@ -1,6 +1,6 @@
-# app_test
+# Yalla bina
 
-A new Flutter project.
+Yalla bina is a mobile app designed to revolutionize the way you plan and coordinate group travel. No more incessant calls asking "Where are you?" or "Did you reach the meeting point?" With Yalla bina, you can create travel groups, invite friends, and effortlessly keep track of each other's movements in real-time through an intuitive Google Maps interface.
 
 ## Getting Started
 
